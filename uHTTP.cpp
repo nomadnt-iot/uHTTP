@@ -12,8 +12,7 @@ uHTTP::uHTTP(EthernetClient& client){
 }
 
 void uHTTP::_parse(){
-
-  uint8_t head = 1;                 // Initialiting in head
+  bool head = true;                 // Initialiting in head
   uint8_t i = 0;                    // Index pointer of char array
   uint8_t s = 0;                    // Number of space encountred
   uint8_t cr = 0;                   // Number of carrige return found
@@ -23,30 +22,23 @@ void uHTTP::_parse(){
     if(head){
       if(c != '\n' && c != '\r'){
         if(c != ' '){
-          char *var;
-          switch(s){
-            case 0:                 // No space found mean that I'm on the method
-              var = _method;
-              break;
-            case 1:                 // First space found mean that I'm on the uri
-              var = _uri;
-              break;
-            case 2:                 // Second space found mean that I'm on the protocol
-              var = _proto;
-              break;
+          if(s == 0){
+            _method[i++] = c;
+            _method[i] = '\0';
+          }else if(s == 1){
+            _uri[i++] = c;
+            _uri[i] = '\0';
           }
-          var[i++] = c;
-          var[i] = '\0';
         }else{
           s++;                        // Incrementing space counter
           i = 0;                      // Resetting index for array
         }
       }else{
         i = 0;                        // Resetting index for array
-        head = 0;                     // Stop to parse header
+        head = false;                 // Stop to parse header
       }
     }else{
-      if(cr / 4 && i < BUFSIZE){
+      if(cr / 4 && i < BODY_SIZE){
         _body[i++] = c;
         _body[i] = '\0';  
       }else{
@@ -54,6 +46,7 @@ void uHTTP::_parse(){
       }
     }
   }
+  _client.flush();
 }
 
 char *uHTTP::method(){
@@ -64,8 +57,27 @@ char *uHTTP::uri(){
   return _uri;
 }
 
-char *uHTTP::proto(){
-  return _proto;
+char *uHTTP::uri(uint8_t segment){
+  if(segment > 0){
+    static char buffer[URI_SIZE] = {0};
+    uint8_t i = 0;
+    uint8_t c = 0;
+    uint8_t s = 0;
+
+    while(_uri[i] != '\0'){
+      if(_uri[i] != '/'){
+        if(segment == s && c < URI_SIZE){
+          buffer[c++] = _uri[i];
+          buffer[c] = '\0';
+        }
+      }else{
+        s++;
+      }
+      i++;
+    }
+    return buffer;
+  }
+  return _uri;
 }
 
 char *uHTTP::body(){
