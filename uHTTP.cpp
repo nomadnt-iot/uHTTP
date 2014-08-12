@@ -59,10 +59,12 @@ char *uHTTP::uri(){
 
 char *uHTTP::uri(uint8_t segment){
   if(segment > 0){
-    static char buffer[URI_SIZE] = {0};
+    char *buffer = new char[URI_SIZE];
     uint8_t i = 0;
     uint8_t c = 0;
     uint8_t s = 0;
+
+    //buffer = (char*)malloc(sizeof(char) * URI_SIZE);
 
     while(_uri[i] != '\0'){
       if(_uri[i] != '/'){
