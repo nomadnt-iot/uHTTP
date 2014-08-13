@@ -10,7 +10,7 @@
 #include "Arduino.h"
 #include "uHTTP.h"
 
-#define DEBUG 0
+// #define DEBUG 0
 
 class uREST{
 

@@ -13,22 +13,27 @@
 #include <uREST.h>
 #include <UIPEthernet.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 uint8_t port = 80;
 
-IPAddress ipaddr(192, 168, 0, 20);
+IPAddress ipaddr(192, 168, 20, 20);
 EthernetServer server = EthernetServer(port);
 
 uint8_t pin[] = {3, 4, 5, 6, 7, 8, 9};					// Allowed Pins to be used from uREST
 uREST resource = uREST(pin);
 
 void setup(){
-    Ethernet.begin(macaddr, ipaddr);
-  	server.begin();
+  Ethernet.begin(macaddr, ipaddr);
+  server.begin();
 
-  	#if DEBUG > 0
+  // Setting pin mode to OUTPUT
+  for(uint8_t i = 0; i < (sizeof(pin)/sizeof(pin[0])); i++){
+    pinMode(pin[i], OUTPUT);
+  }
+
+  #if DEBUG > 0
 	Serial.begin(9600);
 	Serial.print(F("Starting uHTTP at "));
 	Serial.print(ipaddr);
@@ -39,6 +44,4 @@ void setup(){
 
 void loop(){
 	if(EthernetClient client = server.available()) resource.process(client);
-
-	//delay(100);
 }

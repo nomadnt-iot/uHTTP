@@ -12,28 +12,34 @@ uREST::uREST(uint8_t *pin){
 
 bool uREST::process(EthernetClient& client){
   uHTTP *request = new uHTTP(client);
-  String uri = String(request->uri());
-  String key = uri.substring(uri.indexOf('/') + 1, uri.indexOf('/', uri.indexOf('/') + 1));
-  String val = uri.substring(uri.indexOf(key) + key.length() + 1, uri.indexOf('\0', uri.indexOf('/')) + 1);
-  
-  //if(key != NULL && has(key.toInt()) == true){
-  if(key != NULL){
-    // Setter
-    if(val != NULL){
-      uint8_t pin = key.toInt();
+  char *key = request->uri(1);
+  char *val = request->uri(2);
 
-      if(val.equals("HIGH") || val.equals("LOW") || val.equals("INPUT") || val.equals("OUTPUT")){
-        if(val.equals("HIGH")) digitalWrite(pin, HIGH);
-        if(val.equals("LOW")) digitalWrite(pin, LOW);
-        if(val.equals("INPUT")) pinMode(pin, INPUT);
-        if(val.equals("OUTPUT")) digitalWrite(pin, OUTPUT);
+  //Serial.println(*key);
+  //Serial.println(*val);
+  //Serial.println(key);
+  //Serial.println(val);
+
+  //if(key != NULL && has(key.toInt()) == true){
+  if(*key != 0){
+    // Setter
+    if(*val != 0){
+      uint8_t pin = atoi(key);
+      if(strcmp("HIGH", val) == 0){
+        digitalWrite(pin, HIGH);
+      }else if(strcmp("LOW", val) == 0){
+        digitalWrite(pin, LOW);
+      }else if(strcmp("INPUT", val) == 0){
+        pinMode(pin, INPUT);
+      }else if(strcmp("OUTPUT", val) == 0){
+        pinMode(pin, OUTPUT);
       }else{
-        analogWrite(pin, val.toInt());
+        analogWrite(pin, atoi(val));
       }
 
       request->render(F("200 OK"), NULL);
     }else{  // Getter
-      char buffer[255];               // Buffer will contain json output
+      char buffer[255] = {0};             // Buffer will contain json output
 
       if(key[0] == 'A'){
         uint8_t pin = key[1] - '0';
@@ -51,6 +57,8 @@ bool uREST::process(EthernetClient& client){
     request->render(F("404 Not Found"), NULL);
   }
 
+  free(key);
+  free(val);
   delete request;
   return true;
 }

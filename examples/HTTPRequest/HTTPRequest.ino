@@ -46,23 +46,9 @@ void loop(){
 		Serial.println(request.uri());
 		Serial.print(F("BODY: "));
 		Serial.println(request.body());
-		//Serial.print(F("Segment[1]: "));
-		//Serial.println(request.uri(1));
-		//Serial.print(F("Segment[2]: "));
-		//Serial.println(request.uri(2));
-
-		//char *method = request.method();
-		//char *uri = request.uri();
-		//char *body = request.body();
+		
 		char *key = request.uri(1);
 		char *val = request.uri(2);
-
-		//Serial.print(F("METHOD: "));
-		//Serial.println(method);
-		//Serial.print(F("URI: "));
-		//Serial.println(uri);
-		//Serial.print(F("BODY: "));
-		//Serial.println(body);
 		Serial.print(F("Segment[1]: "));
 		Serial.println(key);
 		Serial.print(F("Segment[2]: "));
