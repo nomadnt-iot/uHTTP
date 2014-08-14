@@ -44,25 +44,17 @@ void loop(){
 		Serial.println(request.method());
 		Serial.print(F("URI: "));
 		Serial.println(request.uri());
+		Serial.print(F("Segment[1]: "));
+		Serial.println(request.uri(1));
+		Serial.print(F("Segment[2]: "));
+		Serial.println(request.uri(2));
 		Serial.print(F("GET: "));
 		Serial.println(request.get());
+		Serial.println(request.get("cb"));
+		Serial.println(request.get("_"));
 		Serial.print(F("BODY: "));
 		Serial.println(request.body());
-		
-		char *key = request.uri(1);
-		char *val = request.uri(2);
-		Serial.print(F("Segment[1]: "));
-		Serial.println(key);
-		Serial.print(F("Segment[2]: "));
-		Serial.println(val);
-		free(key);						// It's most important free the pointer
-		free(val);						// It's most important free the pointer
-
-		char *cb = request.get("cb");
-		Serial.print(F("Callback: "));
-		Serial.println(cb);
-		free(cb);						// It's most important free the pointer
   		#endif
 	}
-	delay(10);
+	//delay(10);
 }

@@ -69,29 +69,18 @@ char *uHTTP::uri(){
   return _uri;
 }
 
-char *uHTTP::uri(uint8_t segment){
-  if(segment > 0){
-    char *buffer = new char[URI_SIZE];
-    uint8_t i = 0;
-    uint8_t c = 0;
-    uint8_t s = 0;
+char* uHTTP::uri(uint8_t index){
+   char *act, *segment, *ptr;
+   static char copy[URI_SIZE];
+   uint8_t i;
 
-    //buffer = (char*)malloc(sizeof(char) * URI_SIZE);
+   strcpy(copy, _uri);
 
-    while(_uri[i] != '\0'){
-      if(_uri[i] != '/'){
-        if(segment == s && c < URI_SIZE){
-          buffer[c++] = _uri[i];
-          buffer[c] = '\0';
-        }
-      }else{
-        s++;
-      }
-      i++;
-    }
-    return buffer;
-  }
-  return _uri;
+   for (i = 1, act = copy; i <= index; i++, act = NULL) {
+      segment = strtok_r(act, "/", &ptr);
+      if (segment == NULL) break;
+   }
+   return segment;
 }
 
 char *uHTTP::get(){
@@ -99,19 +88,14 @@ char *uHTTP::get(){
 }
 
 char *uHTTP::get(const char *name){
-  char *ptr;
-  char *buffer = new char[DATA_SIZE];
-
-  ptr = strtok(_data, "&");
-  while(ptr != NULL){
-    if(strncmp(ptr, name, strlen(name)) == 0){
-      strcpy(buffer, (ptr + strlen(name) + 1));
-      break;
-    }
-    ptr = strtok(NULL, "&");
+  char *act, *sub, *ptr;
+  static char copy[URI_SIZE];
+  strcpy(copy, _data);
+  for (act = copy; strncmp(sub, name, strlen(name)); act = NULL) {
+    sub = strtok_r(act, "&", &ptr);
+    if (sub == NULL) break;
   }
-  free(ptr);
-  return buffer;
+  return strchr(sub, '=') + 1;
 }
 
 char *uHTTP::body(){
