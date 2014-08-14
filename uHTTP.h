@@ -12,9 +12,11 @@
 
 // #define DEBUG 0
 #define METHOD_SIZE 8
-#define QUERY_SIZE 128
-#define BODY_SIZE 255
+// #define QUERY_SIZE 128
+#define DATA_SIZE 32
 #define URI_SIZE 32
+#define BODY_SIZE 255
+
 
 class uHTTP{
 
@@ -24,6 +26,8 @@ class uHTTP{
     char *method();
     char *uri();
     char *uri(uint8_t segment);
+    char *get();
+    char *get(const char *name);
     char *body();
 
     void render(const char *status, const char *body);
@@ -34,6 +38,7 @@ class uHTTP{
 
     char _method[METHOD_SIZE] = {0};
     char _uri[URI_SIZE] = {0};
+    char _data[DATA_SIZE] = {0};
     char _body[BODY_SIZE] = {0};
 
     void _parse();

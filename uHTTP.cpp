@@ -13,6 +13,7 @@ uHTTP::uHTTP(EthernetClient& client){
 
 void uHTTP::_parse(){
   bool head = true;                 // Initialiting in head
+  bool data = false;
   uint8_t i = 0;                    // Index pointer of char array
   uint8_t s = 0;                    // Number of space encountred
   uint8_t cr = 0;                   // Number of carrige return found
@@ -26,8 +27,19 @@ void uHTTP::_parse(){
             _method[i++] = c;
             _method[i] = '\0';
           }else if(s == 1){
-            _uri[i++] = c;
-            _uri[i] = '\0';
+            if(c == '?'){
+              data = true;
+              i = 0;
+              continue;
+            }
+
+            if(data){
+              _data[i++] = c;
+              _data[i] = '\0';
+            }else{
+              _uri[i++] = c;
+              _uri[i] = '\0';  
+            }
           }
         }else{
           s++;                        // Incrementing space counter
@@ -80,6 +92,26 @@ char *uHTTP::uri(uint8_t segment){
     return buffer;
   }
   return _uri;
+}
+
+char *uHTTP::get(){
+  return _data;
+}
+
+char *uHTTP::get(const char *name){
+  char *ptr;
+  char *buffer = new char[DATA_SIZE];
+
+  ptr = strtok(_data, "&");
+  while(ptr != NULL){
+    if(strncmp(ptr, name, strlen(name)) == 0){
+      strcpy(buffer, (ptr + strlen(name) + 1));
+      break;
+    }
+    ptr = strtok(NULL, "&");
+  }
+  free(ptr);
+  return buffer;
 }
 
 char *uHTTP::body(){

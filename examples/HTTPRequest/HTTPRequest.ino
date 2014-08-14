@@ -44,6 +44,8 @@ void loop(){
 		Serial.println(request.method());
 		Serial.print(F("URI: "));
 		Serial.println(request.uri());
+		Serial.print(F("GET: "));
+		Serial.println(request.get());
 		Serial.print(F("BODY: "));
 		Serial.println(request.body());
 		
@@ -53,10 +55,13 @@ void loop(){
 		Serial.println(key);
 		Serial.print(F("Segment[2]: "));
 		Serial.println(val);
+		free(key);						// It's most important free the pointer
+		free(val);						// It's most important free the pointer
 
-		// E' necessario liberare la memoria altrimenti si fotte tutto.
-		free(key);
-		free(val);
+		char *cb = request.get("cb");
+		Serial.print(F("Callback: "));
+		Serial.println(cb);
+		free(cb);						// It's most important free the pointer
   		#endif
 	}
 	delay(10);
