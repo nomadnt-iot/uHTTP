@@ -36,25 +36,24 @@ void setup(){
 
 void loop(){
 	if(EthernetClient client = server.available()){
-		uHTTP request = uHTTP(client);
-		request.render(F("200 OK"), NULL);
+		uHTTP *request = new uHTTP(client);
 
 		#if DEBUG > 0
 		Serial.print(F("METHOD: "));
-		Serial.println(request.method());
+		Serial.println(request->method());
 		Serial.print(F("URI: "));
-		Serial.println(request.uri());
+		Serial.println(request->uri());
 		Serial.print(F("Segment[1]: "));
-		Serial.println(request.uri(1));
+		Serial.println(request->uri(1));
 		Serial.print(F("Segment[2]: "));
-		Serial.println(request.uri(2));
-		Serial.print(F("GET: "));
-		Serial.println(request.get());
-		Serial.println(request.get("cb"));
-		Serial.println(request.get("_"));
-		Serial.print(F("BODY: "));
-		Serial.println(request.body());
+		Serial.println(request->uri(2));
+		Serial.print(F("DATA: "));
+		Serial.println(request->data());
+		Serial.println(request->data("cb"));
+		Serial.println(request->data("_"));
   		#endif
+
+  		request->render(F("200 OK"), NULL);
+  		delete request;
 	}
-	//delay(10);
 }

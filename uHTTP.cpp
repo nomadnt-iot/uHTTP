@@ -11,6 +11,12 @@ uHTTP::uHTTP(EthernetClient& client){
   this->_parse();
 }
 
+uHTTP::~uHTTP(){
+  delete [] _method;
+  delete [] _uri;
+  delete [] _data;
+}
+
 void uHTTP::_parse(){
   bool head = true;                 // Initialiting in head
   bool data = false;
@@ -27,13 +33,13 @@ void uHTTP::_parse(){
             _method[i++] = c;
             _method[i] = '\0';
           }else if(s == 1){
-            if(c == '?'){
+            if(c == '?' && strcmp(_method, "GET") == 0){
               data = true;
               i = 0;
               continue;
             }
 
-            if(data){
+            if(data){                 // GET request data
               _data[i++] = c;
               _data[i] = '\0';
             }else{
@@ -50,11 +56,17 @@ void uHTTP::_parse(){
         head = false;                 // Stop to parse header
       }
     }else{
-      if(cr / 4 && i < BODY_SIZE){
-        _body[i++] = c;
-        _body[i] = '\0';  
-      }else{
-        (c != '\n' && c != '\r') ? cr = 0 : cr++;
+      if(strcmp(_method, "POST") == 0 || strcmp(_method, "PUT") == 0){
+        if(cr / 4){
+          data = true;
+        }else{
+          (c != '\n' && c != '\r') ? cr = 0 : cr++;
+        }
+
+        if(data && i < DATA_SIZE){
+          _data[i++] = c;
+          _data[i] = '\0';
+        }
       }
     }
   }
@@ -70,46 +82,30 @@ char *uHTTP::uri(){
 }
 
 char* uHTTP::uri(uint8_t index){
-   char *act, *segment, *ptr;
-   static char copy[URI_SIZE];
-   uint8_t i;
-
-   strcpy(copy, _uri);
-
-   for (i = 1, act = copy; i <= index; i++, act = NULL) {
-      segment = strtok_r(act, "/", &ptr);
-      if (segment == NULL) break;
-   }
-   return segment;
+  char *act, *segment, *ptr;
+  static char copy[URI_SIZE];
+  uint8_t i;
+  strcpy(copy, _uri);
+  for(i = 1, act = copy; i <= index; i++, act = NULL) {
+    segment = strtok_r(act, "/", &ptr);
+    if(segment == NULL) break;
+  }
+  return segment;
 }
 
-char *uHTTP::get(){
+char *uHTTP::data(){
   return _data;
 }
 
-char *uHTTP::get(const char *name){
+char *uHTTP::data(const char *name){
   char *act, *sub, *ptr;
-  static char copy[URI_SIZE];
+  static char copy[DATA_SIZE];
   strcpy(copy, _data);
   for (act = copy; strncmp(sub, name, strlen(name)); act = NULL) {
     sub = strtok_r(act, "&", &ptr);
     if (sub == NULL) break;
   }
   return strchr(sub, '=') + 1;
-}
-
-char *uHTTP::body(){
-  return _body;
-}
-
-void uHTTP::render(const char *status, const char *body){
-  _client.print(F("HTTP/1.1 "));
-  _client.print(status);
-  _client.print(F("\r\n"));
-  _client.print(F("content-type: application/json\r\n\r\n"));
-  _client.print(body);
-  _client.print(F("\r\n"));
-  _client.stop();
 }
 
 void uHTTP::render(const __FlashStringHelper *status, const char *body){

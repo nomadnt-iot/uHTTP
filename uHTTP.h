@@ -10,36 +10,29 @@
 #include "Arduino.h"
 #include "../UIPEthernet/UIPEthernet.h"
 
-// #define DEBUG 0
 #define METHOD_SIZE 8
-// #define QUERY_SIZE 128
 #define DATA_SIZE 32
 #define URI_SIZE 32
-#define BODY_SIZE 255
-
 
 class uHTTP{
 
   public:
     uHTTP(EthernetClient& client);
+    ~uHTTP();
 
     char *method();
     char *uri();
     char *uri(uint8_t segment);
-    char *get();
-    char *get(const char *name);
-    char *body();
-
-    void render(const char *status, const char *body);
+    char *data();
+    char *data(const char *name);
     void render(const __FlashStringHelper *status, const char *body);
 
   private:
     EthernetClient _client;
 
-    char _method[METHOD_SIZE] = {0};
-    char _uri[URI_SIZE] = {0};
-    char _data[DATA_SIZE] = {0};
-    char _body[BODY_SIZE] = {0};
+    char *_method = new char[METHOD_SIZE];
+    char *_uri = new char[URI_SIZE];
+    char *_data = new char[DATA_SIZE];
 
     void _parse();
 };
