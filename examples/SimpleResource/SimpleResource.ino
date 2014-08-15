@@ -43,5 +43,7 @@ void setup(){
 }
 
 void loop(){
-	if(EthernetClient client = server.available()) resource.process(client);
+	if(EthernetClient client = server.available()){
+		resource.process(client);
+	}
 }
