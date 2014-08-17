@@ -97,11 +97,11 @@ char *uHTTP::data(){
   return _data;
 }
 
-char *uHTTP::data(const char *name){
+char *uHTTP::data(const char *key){
   char *act, *sub, *ptr;
   static char copy[DATA_SIZE];
   strcpy(copy, _data);
-  for (act = copy; strncmp(sub, name, strlen(name)); act = NULL) {
+  for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
     sub = strtok_r(act, "&", &ptr);
     if (sub == NULL) break;
   }

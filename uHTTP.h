@@ -24,7 +24,7 @@ class uHTTP{
     char *uri();
     char *uri(uint8_t segment);
     char *data();
-    char *data(const char *name);
+    char *data(const char *key);
     void render(const __FlashStringHelper *status, const char *body);
 
   private:
