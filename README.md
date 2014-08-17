@@ -23,11 +23,6 @@ Be sure to restart the IDE if it was running.
 Configuration
 --
 
-uREST belongs to another library "uHTTP".
-
-#### uHTTP ####
-uHTTP provide methods to navigate HTTP request to Arduino Ethernet.
-
 #### uREST ####
 uREST provide an elegant way to parse and process a REST call from any browser and any device
 
@@ -38,3 +33,11 @@ GET           | /{PIN}/LOW    | Call digitalWrite(pin, LOW);
 GET           | /{PIN}/{VALUE}| Call digitalWrite(pin, VALUE);
 GET           | /{PIN}/INPUT  | Call pinMode(pin, INPUT);
 GET           | /{PIN}/OUTPUT | Call pinMode(pin, OUTPUT);
+
+You can call uREST interface via curl
+
+`curl http://192.168.0.20/A0`
+
+You can send more data via curl:
+
+`curl -G -d "cb=callback&_=0123456789" http://192.168.0.20/A0`
