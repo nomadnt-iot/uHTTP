@@ -6,6 +6,10 @@
 
 #include "uHTTP.h"
 
+//const char JSON[] PROGMEM = { "{\"id\": %i, \"value\": %i}" };
+//const char JSONP[] PROGMEM = { "%s({\"id\": %i, \"value\": %i});" };
+//const char CONTENT_TYPE[] PROGMEM = { "application/json" };
+
 uHTTP::uHTTP(EthernetClient& client){
   _client = client;
   this->_parse();
@@ -33,7 +37,7 @@ void uHTTP::_parse(){
             _method[i++] = c;
             _method[i] = '\0';
           }else if(s == 1){
-            if(c == '?' && strcmp(_method, "GET") == 0){
+            if(c == '?' && strcmp_P(_method, PSTR("GET")) == 0){
               data = true;
               i = 0;
               continue;
@@ -56,7 +60,7 @@ void uHTTP::_parse(){
         head = false;                 // Stop to parse header
       }
     }else{
-      if(strcmp(_method, "POST") == 0 || strcmp(_method, "PUT") == 0){
+      if(strcmp_P(_method, PSTR("POST")) == 0 || strcmp_P(_method, PSTR("PUT")) == 0){
         if(cr / 4){
           data = true;
         }else{
@@ -87,7 +91,7 @@ char* uHTTP::uri(uint8_t index){
   uint8_t i;
   strcpy(copy, _uri);
   for(i = 1, act = copy; i <= index; i++, act = NULL) {
-    segment = strtok_r(act, "/", &ptr);
+    segment = strtok_rP(act, PSTR("/"), &ptr);
     if(segment == NULL) break;
   }
   return segment;
@@ -102,10 +106,11 @@ char *uHTTP::data(const char *key){
   static char copy[DATA_SIZE];
   strcpy(copy, _data);
   for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
-    sub = strtok_r(act, "&", &ptr);
+    sub = strtok_rP(act, PSTR("&"), &ptr);
     if (sub == NULL) break;
   }
-  return strchr(sub, '=') + 1;
+  if(sub != NULL) return strchr(sub, '=') + 1;
+  return NULL;
 }
 
 void uHTTP::render(const __FlashStringHelper *status, const char *body){
