@@ -1,17 +1,7 @@
 #include <EEPROM.h>
-#include <Arduino.h>  // for type definitions
+#include <Arduino.h>
 
-struct Config{
-  bool configured;
-  uint8_t port;
-  bool dhcp;
-  uint8_t ip4addr[4];
-  uint8_t netmask[4];
-  uint8_t gateway[4];
-  uint8_t dns[4];
-} cfg;
-
-template <class T> int config_write(int ee, const T& value)
+template <class T> int configWrite(int ee, const T& value)
 {
     const byte* p = (const byte*)(const void*)&value;
     unsigned int i;
@@ -20,7 +10,7 @@ template <class T> int config_write(int ee, const T& value)
     return i;
 }
 
-template <class T> int config_read(int ee, T& value)
+template <class T> int configRead(int ee, T& value)
 {
     byte* p = (byte*)(void*)&value;
     unsigned int i;

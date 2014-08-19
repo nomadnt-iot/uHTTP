@@ -112,13 +112,3 @@ char *uHTTP::data(const char *key){
   if(sub != NULL) return strchr(sub, '=') + 1;
   return NULL;
 }
-
-void uHTTP::render(const __FlashStringHelper *status, const char *body){
-  _client.print(F("HTTP/1.1 "));
-  _client.print(status);
-  _client.print(F("\r\n"));
-  _client.print(F("content-type: application/json\r\n\r\n"));
-  _client.print(body);
-  _client.print(F("\r\n"));
-  _client.stop();
-}
