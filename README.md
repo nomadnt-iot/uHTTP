@@ -22,5 +22,5 @@ Be sure to restart the IDE if it was running.
 
 Configuration
 --
-u
+
 For any further information please visit our [wiki](https://github.com/nomadnt/uHTTP/wiki).
