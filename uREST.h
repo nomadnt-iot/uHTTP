@@ -7,10 +7,9 @@
 #ifndef uREST_H
 #define uREST_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "uHTTP.h"
 
-// #define DEBUG 0
 #define JSON_SIZE 64
 
 class uREST{
@@ -22,6 +21,9 @@ class uREST{
 
   private:
     uint8_t *_pin;
+    uHTTP *request;
+
+    //void render(const __FlashStringHelper *status, const char *body);
 };
 
 #endif

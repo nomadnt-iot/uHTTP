@@ -31,9 +31,8 @@ bool uREST::process(EthernetClient& client){
         analogWrite(pin, atoi(val));
       }
       request->render(F("200 OK"), NULL);
-
     }else{
-      char buffer[64] = {0};             // Buffer will contain json output
+      char buffer[JSON_SIZE] = {0};             // Buffer will contain json output
       char *cb = request->data("cb");
 
       if(key[0] == 'A'){
@@ -53,14 +52,4 @@ bool uREST::process(EthernetClient& client){
   }
 
   delete request;
-}
-
-bool uREST::has(uint8_t pin){
-  int i = 0;
-  // non si sa perchè come ultimo carattere ho sempre "80"
-  while(_pin[i] != '\0'){
-    if(_pin[i++] == pin) return true;
-    //Serial.println(_pin[i++]);
-  }
-  return false;
 }

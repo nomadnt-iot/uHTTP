@@ -17,9 +17,6 @@
 	<!-- Custom styles for this template -->
 	<!--<link href="dashboard.css" rel="stylesheet">-->
 
-	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-	<!--<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>-->
-
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
   	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -30,17 +27,99 @@
 	<div class="container">
 		<h1 class="page-header">uREST</h1>
 		<div class="row">
-			<div class="col-md-6">Read value</div>
+			<div class="col-md-6">
+				<h4>Analog</h4>
+				<div class="progress">
+  					<div data-pin="A0" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
+				</div>
+			</div>
 			<div class="col-md-6">
 				<h4>Digital</h4>
-				<form id="D3" role="form" class="form-horizontal">
+				<form role="form" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 2</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="2" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="2" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="form-group">
 						<label class="col-sm-2 control-label">PIN 3</label>
 						<div class="col-sm-10">
 							<div class="btn-toolbar" role="toolbar">
 								<div class="btn-group">
-									<button class="btn low">LOW</button>
-									<button class="btn high">HIGH</button>
+									<button type="button" class="btn" data-pin="3" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="3" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 4</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="4" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="4" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 5</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="5" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="5" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 6</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="6" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="6" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 7</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="7" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="7" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 8</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="8" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="8" data-value="HIGH">HIGH</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PIN 9</label>
+						<div class="col-sm-10">
+							<div class="btn-toolbar" role="toolbar">
+								<div class="btn-group">
+									<button type="button" class="btn" data-pin="9" data-value="LOW">LOW</button>
+									<button type="button" class="btn" data-pin="9" data-value="HIGH">HIGH</button>
 								</div>
 							</div>
 						</div>
@@ -54,26 +133,70 @@
 
 	<script>
 	$(document).ready(function(){
-		// PIN 3
 		$.ajax({
 			type: 'GET',
-			url: 'http://192.168.0.20/3/',
-			//cache: false,
-			jsonp: 'cb',
-			jsonpCallback: 'callback',
-			contentType: 'application/json',
-			dataType: 'jsonp'
-		});
-		/*$.getJSON('http://192.168.0.20/3/?cb=?', function(data){
-			if(data.value == "LOW"){
-				$('#D3 button.low').attr('disabled', 'disabled');
-				$('#D3 button.high').removeAttr('disabled');
-			}else{
-				$('#D3 button.high').attr('disabled', 'disabled');
-				$('#D3 button.low').removeAttr('disabled');
+			url: 'http://192.168.0.20/digital/',
+			crossDomain: true,
+			dataType: 'json',
+			success: function(data){
+				$.each(data, function(i, e){
+					if(e.value == "LOW"){
+						$('form button[data-pin="' + e.id + '"][data-value="LOW"]')
+							.addClass('btn-primary');
+						$('form button[data-pin="' + e.id + '"][data-value="HIGH"]')
+							.removeClass('btn-primary');
+					}else{
+						$('form button[data-pin="' + e.id + '"][data-value="HIGH"]')
+							.addClass('btn-primary');
+						$('form button[data-pin="' + e.id + '"][data-value="LOW"]')
+							.removeClass('btn-primary');
+					}
+				});
 			}
-			console.log(data);
-		});*/
+		});
+
+		setInterval(function(){
+			$.ajax({
+				type: 'GET',
+				url: 'http://192.168.0.20/analog/0',
+				crossDomain: true,
+				dataType: 'json',
+				success: function(data){
+					console.log(data);
+					var value = Math.floor((100 * data.value) / 1023);
+					$('div[data-pin="A' + 0 + '"]')
+						.attr('aria-valuenow', value)
+						.css('width', value + '%')
+						.html(value + '%');
+				}
+			});
+		}, 5000);
+
+		$('form button').click(function(){
+			var pin = $(this).data('pin');
+			var value = $(this).data('value');
+
+			$.ajax({
+				type: 'POST',
+				url: 'http://192.168.0.20/digital/' + pin,
+				data: {value: value},
+				crossDomain: true,
+				dataType: 'json',
+				success: function(data){
+					if(data.value == "LOW"){
+						$('form button[data-pin="' + data.id + '"][data-value="LOW"]')
+							.addClass('btn-primary');
+						$('form button[data-pin="' + data.id + '"][data-value="HIGH"]')
+							.removeClass('btn-primary');
+					}else{
+						$('form button[data-pin="' + data.id + '"][data-value="HIGH"]')
+							.addClass('btn-primary');
+						$('form button[data-pin="' + data.id + '"][data-value="LOW"]')
+							.removeClass('btn-primary');
+					}
+				}
+			});
+		});
 	});
 	</script>
 </body>

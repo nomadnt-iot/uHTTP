@@ -13,7 +13,7 @@
 #include <uHTTP.h>
 #include <UIPEthernet.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 uint8_t port = 80;
@@ -45,12 +45,9 @@ void loop(){
 		Serial.println(request->uri());
 		Serial.print(F("Segment[1]: "));
 		Serial.println(request->uri(1));
-		Serial.print(F("Segment[2]: "));
-		Serial.println(request->uri(2));
 		Serial.print(F("DATA: "));
 		Serial.println(request->data());
-		Serial.println(request->data("cb"));
-		Serial.println(request->data("_"));
+		Serial.println(request->data("username"));
   		#endif
 
   		request->render(F("200 OK"), NULL);
