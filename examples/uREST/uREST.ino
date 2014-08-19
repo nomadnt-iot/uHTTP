@@ -6,8 +6,6 @@
 #define DEBUG 1
 #define JSON_SIZE 64
 
-
-
 EthernetServer *server;
 EthernetClient client;
 
