@@ -14,7 +14,7 @@ To install the libraries, you need to place them into your "libraries" folder. Y
   # cd <path/to/your/arduino/distribution>/libraries
   # git clone https://github.com/nomadnt/uHTTP.git
 ```
-Or you download the zipped version of the library from https://github.com/nomadnt/uREST/archive/master.zip, create a directory <path/to/your/arduino/distribution>/libraries/uHTTP and put the contents of the zip-file there.
+Or you download the zipped version of the library from https://github.com/nomadnt/uHTTP/archive/master.zip, create a directory <path/to/your/arduino/distribution>/libraries/uHTTP and put the contents of the zip-file there.
 
 Additional information can be found on the Arduino website: http://www.arduino.cc/en/Hacking/Libraries
 
@@ -22,5 +22,5 @@ Be sure to restart the IDE if it was running.
 
 Configuration
 --
-
+u
 For any further information please visit our [wiki](https://github.com/nomadnt/uHTTP/wiki).
