@@ -3,7 +3,7 @@ uHTTP
 
 uHTTP is a tiny library for Arduino that provide a very manner way to access to HTTP request data
 
-This library is written by Filippo Sallemi <tonyputi@gmail.com>
+This library is written by Filippo Sallemi <fsallemi@nomadnt.com>
 
 Installation
 --
@@ -22,5 +22,5 @@ Be sure to restart the IDE if it was running.
 
 Configuration
 --
-u
+
 For any further information please visit our [wiki](https://github.com/nomadnt/uHTTP/wiki).
