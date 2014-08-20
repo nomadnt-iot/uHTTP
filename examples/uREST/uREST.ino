@@ -75,6 +75,10 @@ void setup(){
 void loop(){
 	if(client = server->available()){
 		uHTTP request = uHTTP(client);
+		if(strcmp_P(request.method(), PSTR("OPTIONS")) == 0){
+			render(F("200 OK"), NULL);
+		}
+
 		if(strcmp_P(request.uri(1), PSTR("digital")) == 0){
 			digitalCommand(request);
 		}else if(strcmp_P(request.uri(1), PSTR("analog")) == 0){
@@ -83,11 +87,7 @@ void loop(){
 			configCommand(request);
 		}
 	}else{
-		if(_reset){
-			resetFunc();
-			resetFunc();
-			//reboot();
-		}
+		if(_reset){ reboot(); }
 	}
 	
 	delay(10);
@@ -99,8 +99,8 @@ void digitalCommand(uHTTP &request){
 	uint8_t pin = atoi(request.uri(2));
 	if(has_digital(pin)){
 		char *value, *mode;		
-		if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("POST")) == 0){
-			if(strcmp_P(request.method(), PSTR("POST")) == 0){
+		if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("PUT")) == 0){
+			if(strcmp_P(request.method(), PSTR("PUT")) == 0){
 				mode = request.data("mode");
 				if(strcmp_P(mode, PSTR("INPUT")) == 0 || strcmp_P(mode, PSTR("OUTPUT")) == 0){
 					(strcmp_P(mode, PSTR("INPUT")) == 0) ? pinMode(pin, INPUT) : pinMode(pin, OUTPUT);
@@ -141,8 +141,8 @@ void analogCommand(uHTTP &request){
 	if(has_analog(pin)){		
 		uint8_t value;
 		char *mode;
-		if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("POST")) == 0){
-			if(strcmp_P(request.method(), PSTR("POST")) == 0){
+		if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("PUT")) == 0){
+			if(strcmp_P(request.method(), PSTR("PUT")) == 0){
 				mode = request.data("mode");
 				if(strcmp_P(mode, PSTR("INPUT")) == 0 || strcmp_P(mode, PSTR("OUTPUT")) == 0){
 					(strcmp_P(mode, PSTR("INPUT")) == 0) ? pinMode(pin, INPUT) : pinMode(pin, OUTPUT);
@@ -177,9 +177,9 @@ void analogCommand(uHTTP &request){
 void configCommand(uHTTP &request){
 	char buffer[JSON_SIZE];
 
-	if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("POST")) == 0){
+	if(strcmp_P(request.method(), PSTR("GET")) == 0 || strcmp_P(request.method(), PSTR("PUT")) == 0){
 		bool changed = false;
-		if(strcmp_P(request.method(), PSTR("POST")) == 0){
+		if(strcmp_P(request.method(), PSTR("PUT")) == 0){
 			if(request.data("port") && atoi(request.data("port")) != cfg.port){
 				cfg.port = atoi(request.data("port"));
 				changed = true;
@@ -230,7 +230,8 @@ void send_headers(const __FlashStringHelper *status){
 	client.print(F("\r\n"));
 	client.print(F("content-type: application/json\r\n"));
 	client.print(F("access-control-allow-origin: *\r\n"));
-	client.print(F("access-control-allow-methods: PUT\r\n"));
+	client.print(F("access-control-allow-methods: GET,PUT\r\n"));
+	client.print(F("access-control-allow-headers: Content-Type, X-Requested-With\r\n"));
 	client.print(F("access-control-max-age: 1000\r\n"));
 	client.println();
 }
@@ -240,7 +241,6 @@ void render(const __FlashStringHelper *status, const char *body){
 	client.println(body);
 	client.stop();
 }
-
 
 void reboot(){_reset = false; wdt_enable(WDTO_15MS); while(1) {}}
 void firstboot(){for(int addr = 0; addr < E2END; addr++) EEPROM.write(addr, 0); }
