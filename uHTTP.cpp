@@ -6,12 +6,6 @@
 
 #include "uHTTP.h"
 
-//const char JSON[] PROGMEM = { "{\"id\": %i, \"value\": %i}" };
-//const char JSONP[] PROGMEM = { "%s({\"id\": %i, \"value\": %i});" };
-//const char CONTENT_TYPE[] PROGMEM = { "application/json" };
-
-const char auth_re[] PROGMEM = { "Authorization: Basic " };
-
 uHTTP::uHTTP(EthernetClient& client){
   _client = client;
   this->_parse();
