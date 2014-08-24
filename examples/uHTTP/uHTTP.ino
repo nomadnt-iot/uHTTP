@@ -10,8 +10,9 @@
  * This example code is in the public domain.
  **/
 
-#include <uHTTP.h>
 #include <UIPEthernet.h>
+#include <uHTTP.h>
+#include <Base64.h>
 
 #define DEBUG 0
 
@@ -39,34 +40,32 @@ void loop(){
 		uHTTP *request = new uHTTP(client);
 
 		#if DEBUG > 0
-		Serial.print(F("METHOD: "));
 		// You can get request method:
+		Serial.print(F("METHOD: "));
 		Serial.println(request->method());
-		Serial.print(F("URI: "));
 		// Or you can get complete uri:
+		Serial.print(F("URI: "));
 		Serial.println(request->uri());
-		Serial.print(F("Segment[1]: "));
 		// Or you can get only first segment from uri:
+		Serial.print(F("Segment[1]: "));
 		Serial.println(request->uri(1));
-		Serial.print(F("Segment[2]: "));
 		// Or you can get only second segment from uri:
+		Serial.print(F("Segment[2]: "));
 		Serial.println(request->uri(2));
-		Serial.print(F("DATA: "));
-		// Or you can get all data from GET or POST in x-www-form-urlencoded format:
-		Serial.println(request->data());
-		// Or you can get only one variable from data:
+		// Or you can get variable from GET/POST/PUT/DELETE data:
+		Serial.print(F("DATA[username]: "));
 		Serial.println(request->data("username"));
+		Serial.print(F("Authorization: "));
+		Serial.println(request->auth());
+
+		char message[32] = {0};
+		base64_decode(message, request->auth(), strlen(request->auth()));
+		Serial.println(message);
   		#endif
 
   		client.println(F("HTTP/1.1 200 OK"));
   		client.println(F("content-type: text/plain"));
   		client.println();
-  		client.print(F("Method: "));
-  		client.println(request->method());
-  		client.print(F("URI: "));
-  		client.println(request->uri());
-  		client.print(F("DATA: "));
-  		client.println(request->data());
   		client.stop();
 
   		delete request;

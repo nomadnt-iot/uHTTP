@@ -10,6 +10,8 @@
 //const char JSONP[] PROGMEM = { "%s({\"id\": %i, \"value\": %i});" };
 //const char CONTENT_TYPE[] PROGMEM = { "application/json" };
 
+const char auth_re[] PROGMEM = { "Authorization: Basic " };
+
 uHTTP::uHTTP(EthernetClient& client){
   _client = client;
   this->_parse();
@@ -18,62 +20,68 @@ uHTTP::uHTTP(EthernetClient& client){
 uHTTP::~uHTTP(){
   delete [] _method;
   delete [] _uri;
+  delete [] _auth;
   delete [] _data;
 }
 
 void uHTTP::_parse(){
-  bool head = true;                 // Initialiting in head
+  uint8_t head = 0;
+  uint8_t cursor = 0;
+  uint8_t space = 0;
+  uint8_t counter = 0;
+  uint8_t cr = 0;
   bool data = false;
-  uint8_t i = 0;                    // Index pointer of char array
-  uint8_t s = 0;                    // Number of space encountred
-  uint8_t cr = 0;                   // Number of carrige return found
+  bool auth = false;
 
+  // Initializing buffer of RE_AUTH
+  char buffer[24]; strcpy_P(buffer, RE_AUTH);
+  
   while(_client.available() > 0){
     char c = _client.read();
-    if(head){
-      if(c != '\n' && c != '\r'){
+
+    if((cr / 4) == 0){
+      // Qui sono nell header
+      if(head == 0){
+        // First header line
         if(c != ' '){
-          if(s == 0){
-            _method[i++] = c;
-            _method[i] = '\0';
-          }else if(s == 1){
-            if(c == '?' && strcmp_P(_method, PSTR("GET")) == 0){
-              data = true;
-              i = 0;
-              continue;
-            }
+          if(space == 0){
+            if(cursor < METHOD_SIZE) _method[cursor++] = c; _method[cursor] = '\0';
+          }else if(space == 1){
+            if(c == '?' && strcmp_P(_method, PSTR("GET")) == 0){ data = true; cursor = 0; continue; }
 
-            if(data){                 // GET request data
-              _data[i++] = c;
-              _data[i] = '\0';
-            }else{
-              _uri[i++] = c;
-              _uri[i] = '\0';  
-            }
+            // GET request data
+            if(data && cursor < DATA_SIZE){ _data[cursor++] = c; _data[cursor] = '\0'; }
+            else{ _uri[cursor++] = c; _uri[cursor] = '\0'; }
           }
-        }else{
-          s++;                        // Incrementing space counter
-          i = 0;                      // Resetting index for array
-        }
+        }else{ space++; cursor = 0; }
       }else{
-        i = 0;                        // Resetting index for array
-        head = false;                 // Stop to parse header
-      }
-    }else{
-      if(strcmp_P(_method, PSTR("POST")) == 0 || strcmp_P(_method, PSTR("PUT")) == 0){
-        if(cr / 4){
-          data = true;
+        // Rest of header lines
+
+        if(auth && (c != '\r' && c != '\n')){
+          // Qui devo popolare l'array per authorization
+          if(cursor < AUTH_SIZE){ _auth[cursor++] = c; _auth[cursor] = '\0'; }
         }else{
-          (c != '\n' && c != '\r') ? cr = 0 : cr++;
+          // Count compatible char in RE_AUTH
+          if(c == buffer[cursor++]){ counter++; }
+          // If the number of chars matched are the same number 
+          if(counter / strlen(buffer)){ auth = true; cursor = 0; }
         }
 
-        if(data && i < DATA_SIZE){
-          _data[i++] = c;
-          _data[i] = '\0';
-        }
+      }
+
+      if(c == '\r' || c == '\n'){
+        cr++;
+        if(cr / 2){ head++; cursor = 0; counter = 0; auth = false; }
+      }else cr = 0;
+
+    }else{
+      // Qui sono nel body
+      if(strcmp_P(_method, PSTR("POST")) == 0 || strcmp_P(_method, PSTR("PUT")) == 0){
+        if(cursor < DATA_SIZE){ _data[cursor++] = c; _data[cursor] = '\0'; }
       }
     }
   }
+
   _client.flush();
 }
 
@@ -97,8 +105,8 @@ char* uHTTP::uri(uint8_t index){
   return segment;
 }
 
-char *uHTTP::data(){
-  return _data;
+char *uHTTP::auth(){
+  return _auth;
 }
 
 char *uHTTP::data(const char *key){

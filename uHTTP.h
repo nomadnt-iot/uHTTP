@@ -7,12 +7,16 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <avr/pgmspace.h>
 #include "../UIPEthernet/UIPEthernet.h"
 
 #define METHOD_SIZE 8
+#define URI_SIZE 16
+#define AUTH_SIZE 32
 #define DATA_SIZE 32
-#define URI_SIZE 32
+
+const char RE_AUTH[] PROGMEM = "Authorization: Basic ";
 
 class uHTTP{
 
@@ -23,7 +27,7 @@ class uHTTP{
     char *method();
     char *uri();
     char *uri(uint8_t segment);
-    char *data();
+    char *auth();
     char *data(const char *key);
     void render(const __FlashStringHelper *status, const char *body);
 
@@ -32,6 +36,7 @@ class uHTTP{
 
     char *_method = new char[METHOD_SIZE];
     char *_uri = new char[URI_SIZE];
+    char *_auth = new char[AUTH_SIZE];
     char *_data = new char[DATA_SIZE];
 
     void _parse();
