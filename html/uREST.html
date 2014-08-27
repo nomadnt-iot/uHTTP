@@ -128,76 +128,10 @@
 			</div>
 		</div>
 	</div>
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-	<script>
-	$(document).ready(function(){
-		$.ajax({
-			type: 'GET',
-			url: 'http://192.168.0.20/digital/',
-			crossDomain: true,
-			dataType: 'json',
-			success: function(data){
-				$.each(data, function(i, e){
-					if(e.value == "LOW"){
-						$('form button[data-pin="' + e.id + '"][data-value="LOW"]')
-							.addClass('btn-primary');
-						$('form button[data-pin="' + e.id + '"][data-value="HIGH"]')
-							.removeClass('btn-primary');
-					}else{
-						$('form button[data-pin="' + e.id + '"][data-value="HIGH"]')
-							.addClass('btn-primary');
-						$('form button[data-pin="' + e.id + '"][data-value="LOW"]')
-							.removeClass('btn-primary');
-					}
-				});
-			}
-		});
-
-		setInterval(function(){
-			$.ajax({
-				type: 'GET',
-				url: 'http://192.168.0.20/analog/0',
-				crossDomain: true,
-				dataType: 'json',
-				success: function(data){
-					console.log(data);
-					var value = Math.floor((100 * data.value) / 1023);
-					$('div[data-pin="A' + 0 + '"]')
-						.attr('aria-valuenow', value)
-						.css('width', value + '%')
-						.html(value + '%');
-				}
-			});
-		}, 5000);
-
-		$('form button').click(function(){
-			var pin = $(this).data('pin');
-			var value = $(this).data('value');
-
-			$.ajax({
-				type: 'POST',
-				url: 'http://192.168.0.20/digital/' + pin,
-				data: {value: value},
-				crossDomain: true,
-				dataType: 'json',
-				success: function(data){
-					if(data.value == "LOW"){
-						$('form button[data-pin="' + data.id + '"][data-value="LOW"]')
-							.addClass('btn-primary');
-						$('form button[data-pin="' + data.id + '"][data-value="HIGH"]')
-							.removeClass('btn-primary');
-					}else{
-						$('form button[data-pin="' + data.id + '"][data-value="HIGH"]')
-							.addClass('btn-primary');
-						$('form button[data-pin="' + data.id + '"][data-value="LOW"]')
-							.removeClass('btn-primary');
-					}
-				}
-			});
-		});
-	});
-	</script>
+	<script src="uREST.js"></script>
 </body>
 </html>
