@@ -1,18 +1,16 @@
 /**
- * EthernetRequest
+ * HTTP Parser
  * Parse an HTTP request and print to serial the following values:
  *
- * method: the requested method (GET POST PUT PATCH DELETE)
+ * method: the requested method (GET HEAD POST PUT PATCH DELETE OPTIONS)
  * uri : the requested url
- * proto: the requested protocol (HTTP/1.1)
- * body: the body request
+ * data: the requested data if GET query string ? data if POST/PUT body data
  * 
  * This example code is in the public domain.
  **/
 
 #include <UIPEthernet.h>
 #include <uHTTP.h>
-#include <Base64.h>
 
 #define DEBUG 0
 
@@ -58,9 +56,6 @@ void loop(){
 		Serial.print(F("Authorization: "));
 		Serial.println(request->auth());
 
-		char message[32] = {0};
-		base64_decode(message, request->auth(), strlen(request->auth()));
-		Serial.println(message);
   		#endif
 
   		client.println(F("HTTP/1.1 200 OK"));

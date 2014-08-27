@@ -1,5 +1,5 @@
 /*
-  uHTTP.h - Library that implement HTTP request interface.
+  uHTTP.cpp - Library that implement HTTP request interface.
   Created by Filippo Sallemi, July 23, 2014.
   Released into the public domain.
 */
