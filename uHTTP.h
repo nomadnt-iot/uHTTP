@@ -14,9 +14,8 @@
 #define METHOD_SIZE 8
 #define URI_SIZE 16
 #define AUTH_SIZE 32
+#define ORIG_SIZE 32
 #define DATA_SIZE 32
-
-const char RE_AUTH[] PROGMEM = "Authorization: Basic ";
 
 class uHTTP{
 
@@ -28,6 +27,7 @@ class uHTTP{
     char *uri();
     char *uri(uint8_t segment);
     char *auth();
+    char *orig();
     char *data(const char *key);
 
   private:
@@ -36,6 +36,7 @@ class uHTTP{
     char *_method = new char[METHOD_SIZE];
     char *_uri = new char[URI_SIZE];
     char *_auth = new char[AUTH_SIZE];
+    char *_orig = new char[ORIG_SIZE];
     char *_data = new char[DATA_SIZE];
 
     void _parse();

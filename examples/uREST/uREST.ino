@@ -1,11 +1,6 @@
 /**
- * EthernetRequest
- * Parse an HTTP request and print to serial the following values:
- *
- * method: the requested method (GET POST PUT PATCH DELETE)
- * uri : the requested url
- * proto: the requested protocol (HTTP/1.1)
- * body: the body request
+ * Rest Interface
+ * Parse an HTTP request and use data to buil REST-like interface
  * 
  * This example code is in the public domain.
  **/

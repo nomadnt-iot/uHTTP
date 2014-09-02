@@ -8,6 +8,14 @@
 
 uHTTP::uHTTP(EthernetClient& client){
   _client = client;
+
+  // Trovare un modo per cambiare questo in {0}
+  memset(_method, 0, sizeof _method);
+  memset(_uri, 0, sizeof _uri);
+  memset(_auth, 0, sizeof _auth);
+  memset(_orig, 0, sizeof _orig);
+  memset(_data, 0, sizeof _data);
+  
   this->_parse();
 }
 
@@ -15,6 +23,7 @@ uHTTP::~uHTTP(){
   delete [] _method;
   delete [] _uri;
   delete [] _auth;
+  delete [] _orig;
   delete [] _data;
 }
 
@@ -22,13 +31,12 @@ void uHTTP::_parse(){
   uint8_t head = 0;
   uint8_t cursor = 0;
   uint8_t space = 0;
-  uint8_t counter = 0;
   uint8_t cr = 0;
   bool data = false;
   bool auth = false;
 
   // Initializing buffer of RE_AUTH
-  char buffer[24]; strcpy_P(buffer, RE_AUTH);
+  char buffer[128] = {0};
   
   while(_client.available() > 0){
     char c = _client.read();
@@ -50,27 +58,29 @@ void uHTTP::_parse(){
         }else{ space++; cursor = 0; }
       }else{
         // Rest of header lines
-
-        if(auth && (c != '\r' && c != '\n')){
-          // Qui devo popolare l'array per authorization
-          if(cursor < AUTH_SIZE){ _auth[cursor++] = c; _auth[cursor] = '\0'; }
+        if(c != '\r' && c != '\n' && cursor < 128){
+          buffer[cursor++] = c;
+          buffer[cursor] = '\0';
         }else{
-          // Count compatible char in RE_AUTH
-          if(c == buffer[cursor++]){ counter++; }
-          // If the number of chars matched are the same number 
-          if(counter / strlen(buffer)){ auth = true; cursor = 0; }
+          if(cr == 1){            
+            if(strncmp_P(buffer, PSTR("Origin: "), 8) == 0){
+              strcpy(_orig, buffer + 8);
+            }else if(strncmp_P(buffer, PSTR("Authorization: Basic "), 21) == 0){
+              strcpy(_auth, buffer + 21);
+            }
+          }
         }
-
       }
 
       if(c == '\r' || c == '\n'){
         cr++;
-        if(cr / 2){ head++; cursor = 0; counter = 0; auth = false; }
+        if(cr / 2){ head++; cursor = 0; }
       }else cr = 0;
 
     }else{
       // Qui sono nel body
       if(strcmp_P(_method, PSTR("POST")) == 0 || strcmp_P(_method, PSTR("PUT")) == 0){
+        Serial.print(c);
         if(cursor < DATA_SIZE){ _data[cursor++] = c; _data[cursor] = '\0'; }
       }
     }
@@ -101,6 +111,10 @@ char* uHTTP::uri(uint8_t index){
 
 char *uHTTP::auth(){
   return _auth;
+}
+
+char *uHTTP::orig(){
+  return _orig;
 }
 
 char *uHTTP::data(const char *key){

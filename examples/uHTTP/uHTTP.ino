@@ -12,7 +12,7 @@
 #include <UIPEthernet.h>
 #include <uHTTP.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 uint8_t port = 80;
@@ -53,9 +53,12 @@ void loop(){
 		// Or you can get variable from GET/POST/PUT/DELETE data:
 		Serial.print(F("DATA[username]: "));
 		Serial.println(request->data("username"));
+		// Or you can get Authorization token:
 		Serial.print(F("Authorization: "));
 		Serial.println(request->auth());
-
+		// Or you can get Origin header:
+		Serial.print(F("Origin: "));
+		Serial.println(request->orig());
   		#endif
 
   		client.println(F("HTTP/1.1 200 OK"));
