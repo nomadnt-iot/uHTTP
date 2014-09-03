@@ -17,7 +17,7 @@
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 uint8_t port = 80;
 
-IPAddress ipaddr(192, 168, 0, 20);
+IPAddress ipaddr(192, 168, 10, 33);
 EthernetServer server = EthernetServer(port);
 
 void setup(){

@@ -28,18 +28,17 @@ class uHTTP{
     char *uri(uint8_t segment);
     char *auth();
     char *orig();
+    char *data();
     char *data(const char *key);
 
   private:
     EthernetClient _client;
 
-    char *_method = new char[METHOD_SIZE];
-    char *_uri = new char[URI_SIZE];
-    char *_auth = new char[AUTH_SIZE];
-    char *_orig = new char[ORIG_SIZE];
-    char *_data = new char[DATA_SIZE];
-
-    void _parse();
+    char *_method = new char[METHOD_SIZE]();
+    char *_uri = new char[URI_SIZE]();
+    char *_auth = new char[AUTH_SIZE]();
+    char *_orig = new char[ORIG_SIZE]();
+    char *_data = new char[DATA_SIZE]();
 };
 
 #endif

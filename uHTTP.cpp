@@ -9,25 +9,6 @@
 uHTTP::uHTTP(EthernetClient& client){
   _client = client;
 
-  // Trovare un modo per cambiare questo in {0}
-  memset(_method, 0, sizeof _method);
-  memset(_uri, 0, sizeof _uri);
-  memset(_auth, 0, sizeof _auth);
-  memset(_orig, 0, sizeof _orig);
-  memset(_data, 0, sizeof _data);
-  
-  this->_parse();
-}
-
-uHTTP::~uHTTP(){
-  delete [] _method;
-  delete [] _uri;
-  delete [] _auth;
-  delete [] _orig;
-  delete [] _data;
-}
-
-void uHTTP::_parse(){
   uint8_t head = 0;
   uint8_t cursor = 0;
   uint8_t space = 0;
@@ -80,13 +61,20 @@ void uHTTP::_parse(){
     }else{
       // Qui sono nel body
       if(strcmp_P(_method, PSTR("POST")) == 0 || strcmp_P(_method, PSTR("PUT")) == 0){
-        Serial.print(c);
         if(cursor < DATA_SIZE){ _data[cursor++] = c; _data[cursor] = '\0'; }
       }
     }
   }
 
   _client.flush();
+}
+
+uHTTP::~uHTTP(){
+  delete [] _method;
+  delete [] _uri;
+  delete [] _auth;
+  delete [] _orig;
+  delete [] _data;
 }
 
 char *uHTTP::method(){
@@ -115,6 +103,10 @@ char *uHTTP::auth(){
 
 char *uHTTP::orig(){
   return _orig;
+}
+
+char *uHTTP::data(){
+  return _data;
 }
 
 char *uHTTP::data(const char *key){
