@@ -28,20 +28,19 @@ uHTTP::uHTTP(EthernetClient& client){
         // First header line
         if(c != ' '){
           if(space == 0){
-            if(cursor < METHOD_SIZE) _method[cursor++] = c; _method[cursor] = '\0';
+            if(cursor < METHOD_SIZE){ _method[cursor++] = c; _method[cursor] = '\0'; }
           }else if(space == 1){
             if(c == '?' && strcmp_P(_method, PSTR("GET")) == 0){ data = true; cursor = 0; continue; }
 
             // GET request data
             if(data && cursor < DATA_SIZE){ _data[cursor++] = c; _data[cursor] = '\0'; }
-            else{ _uri[cursor++] = c; _uri[cursor] = '\0'; }
+            else if(cursor < URI_SIZE){ _uri[cursor++] = c; _uri[cursor] = '\0'; }
           }
         }else{ space++; cursor = 0; }
       }else{
         // Rest of header lines
         if(c != '\r' && c != '\n' && cursor < 128){
-          buffer[cursor++] = c;
-          buffer[cursor] = '\0';
+          buffer[cursor++] = c; buffer[cursor] = '\0';
         }else{
           if(cr == 1){            
             if(strncmp_P(buffer, PSTR("Origin: "), 8) == 0){
@@ -54,8 +53,7 @@ uHTTP::uHTTP(EthernetClient& client){
       }
 
       if(c == '\r' || c == '\n'){
-        cr++;
-        if(cr / 2){ head++; cursor = 0; }
+        cr++; if(cr / 2){ head++; cursor = 0; }
       }else cr = 0;
 
     }else{
