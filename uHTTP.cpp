@@ -7,7 +7,6 @@
 #include "uHTTP.h"
 
 uHTTP::uHTTP(EthernetClient& client){
-  //_client = client;
   typedef enum {METHOD, URI, DATA, PROTO, HEAD, BODY, STOP} parse_state;
   parse_state state = METHOD;
 
