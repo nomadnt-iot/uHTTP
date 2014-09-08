@@ -50,15 +50,21 @@ void loop(){
 		// Or you can get only second segment from uri:
 		Serial.print(F("Segment[2]: "));
 		Serial.println(request->uri(2));
+		// Or you can get query string:
+		Serial.print(F("QUERY STRING: "));
+		Serial.println(request->data());
 		// Or you can get variable from GET/POST/PUT/DELETE data:
 		Serial.print(F("DATA[username]: "));
 		Serial.println(request->data("username"));
 		// Or you can get Authorization token:
 		Serial.print(F("Authorization: "));
-		Serial.println(request->auth());
+		Serial.println(request->head(HEADER_AUTH));
 		// Or you can get Origin header:
 		Serial.print(F("Origin: "));
-		Serial.println(request->orig());
+		Serial.println(request->head(HEADER_ORIG));
+		// Or you can get body:
+		Serial.print(F("BODY: "));
+		Serial.println(request->body());
   		#endif
 
   		client.println(F("HTTP/1.1 200 OK"));
