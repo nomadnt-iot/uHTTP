@@ -15,7 +15,8 @@ uHTTP::uHTTP(EthernetClient& client){
   uint8_t cr = 0;
 
   bool key = true;
-  char header[128] = {0};
+  char header[HEAD_SIZE] = {0};
+  char method[METHOD_SIZE] = {0};
 
   while(client.available() > 0){
     char c = client.read();
@@ -24,8 +25,21 @@ uHTTP::uHTTP(EthernetClient& client){
 
     switch(state){
       case METHOD:
-        if(c == ' '){ state = URI; cursor = 0; }
-        else if(cursor < METHOD_SIZE - 1){ _method[cursor++] = c; _method[cursor] = '\0'; }
+        if(c == ' '){
+          if(strcmp_P(method, PSTR("OPTIONS")) == 0) _method = METHOD_OPTIONS;
+          else if(strcmp_P(method, PSTR("GET")) == 0) _method = METHOD_GET;
+          else if(strcmp_P(method, PSTR("HEAD")) == 0) _method = METHOD_HEAD;
+          else if(strcmp_P(method, PSTR("POST")) == 0) _method = METHOD_POST;
+          else if(strcmp_P(method, PSTR("PUT")) == 0) _method = METHOD_PUT;
+          else if(strcmp_P(method, PSTR("PATCH")) == 0) _method = METHOD_PATCH;
+          else if(strcmp_P(method, PSTR("DELETE")) == 0) _method = METHOD_DELETE;
+          else if(strcmp_P(method, PSTR("TRACE")) == 0) _method = METHOD_TRACE;
+          else if(strcmp_P(method, PSTR("CONNECT")) == 0) _method = METHOD_CONNECT;
+          else _method = METHOD_UNKNOWN;
+          state = URI; 
+          cursor = 0; 
+        }
+        else if(cursor < METHOD_SIZE - 1){ method[cursor++] = c; method[cursor] = '\0'; }
         break;
       case URI:
         if(c == ' '){ state = PROTO; cursor = 0; }
@@ -67,13 +81,12 @@ uHTTP::uHTTP(EthernetClient& client){
 }
 
 uHTTP::~uHTTP(){
-  delete [] _method;
   delete [] _uri;
   delete [] _data;
   delete [] _body;
 }
 
-char *uHTTP::method(){
+uint8_t uHTTP::method(){
   return _method;
 }
 
