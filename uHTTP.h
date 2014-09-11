@@ -7,9 +7,15 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
+#define uHTTP_uIP
+
 #include <Arduino.h>
-#include <avr/pgmspace.h>
-#include "../UIPEthernet/UIPEthernet.h"
+#ifdef uHTTP_uIP
+#include <UIPEthernet.h>
+#else
+#include <SPI.h>
+#include <Ethernet.h>
+#endif
 
 // Method types
 #define METHOD_UNKNOWN  0
@@ -24,17 +30,19 @@
 #define METHOD_CONNECT  9
 
 // Header types
-#define HEADER_AUTH     0
-#define HEADER_ORIG     1
+#define HEADER_TYPE     0
+#define HEADER_AUTH     1
+#define HEADER_ORIG     2
 
 // Sizes
 #define METHOD_SIZE     8
-#define URI_SIZE        16
-#define DATA_SIZE       32
+#define URI_SIZE        32
+#define QUERY_SIZE      32
 #define HEAD_SIZE       32
-#define BODY_SIZE       32
+#define BODY_SIZE       64
 
 typedef struct Header{
+  char type[HEAD_SIZE] = {0};
   char auth[HEAD_SIZE] = {0};
   char orig[HEAD_SIZE] = {0};
 };
@@ -42,24 +50,30 @@ typedef struct Header{
 class uHTTP{
 
   public:
-    uHTTP(EthernetClient& client);
+    uHTTP(uint16_t port);
     ~uHTTP();
+
+    EthernetClient *process();
 
     uint8_t method();
     char *uri();
     char *uri(uint8_t segment);
-    char *data();
-    char *data(const char *key);
+    char *query();
+    char *query(const char *key);
     char *body();
 
     Header head();
-    char *head(uint8_t header);
+    char *head(uint8_t key);
 
   private:
-    uint8_t _method;
+    EthernetServer *server;
+    EthernetClient client;
+
     Header _head;
+
+    uint8_t _method;
     char *_uri = new char[URI_SIZE]();
-    char *_data = new char[DATA_SIZE]();
+    char *_query = new char[QUERY_SIZE]();
     char *_body = new char[BODY_SIZE]();
 };
 
