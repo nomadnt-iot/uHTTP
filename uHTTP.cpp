@@ -7,6 +7,10 @@
 #include "uHTTP.h"
 
 uHTTP::uHTTP(uint16_t port){
+  this->_uri = new char[URI_SIZE];
+  this->_query = new char[QUERY_SIZE];
+  this->_body = new char[BODY_SIZE];
+
   server = new EthernetServer(port);
   server->begin();
 }
@@ -122,7 +126,8 @@ char* uHTTP::uri(uint8_t index){
   uint8_t i;
   strcpy(copy, _uri);
   for(i = 1, act = copy; i <= index; i++, act = NULL) {
-    segment = strtok_rP(act, PSTR("/"), &ptr);
+    //segment = strtok_rP(act, PSTR("/"), &ptr);
+    segment = strtok_r(act, "/", &ptr);
     if(segment == NULL) break;
   }
   return segment;
@@ -158,7 +163,8 @@ char *uHTTP::query(const char *key){
   static char copy[QUERY_SIZE];
   strcpy(copy, _query);
   for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
-    sub = strtok_rP(act, PSTR("&"), &ptr);
+    //sub = strtok_rP(act, PSTR("&"), &ptr);
+    sub = strtok_r(act, "&", &ptr);
     if (sub == NULL) break;
   }
   if(sub != NULL) return strchr(sub, '=') + 1;

@@ -9,7 +9,8 @@
  * This example code is in the public domain.
  **/
 
-#include <UIPEthernet.h>
+#include <SPI.h>
+#include <Ethernet.h>
 #include <uHTTP.h>
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
@@ -30,6 +31,7 @@ void setup(){
 
 void loop(){
 	EthernetClient *response;
+
 	if((response = HTTP->process())){
 		// You can get request method:
 		Serial.print(F("METHOD: "));
@@ -65,7 +67,7 @@ void loop(){
 		response->println(F("HTTP/1.1 200 OK"));
 		response->println(F("Content-Type"));
 		response->println();
-		response->println(F("Hellow World!"));
+		response->println(F("Hello World!"));
 		response->stop();
 	}
 }

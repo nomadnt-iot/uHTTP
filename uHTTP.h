@@ -7,7 +7,7 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-#define uHTTP_uIP
+// #define uHTTP_uIP
 
 #include <Arduino.h>
 #ifdef uHTTP_uIP
@@ -42,9 +42,9 @@
 #define BODY_SIZE       64
 
 typedef struct Header{
-  char type[HEAD_SIZE] = {0};
-  char auth[HEAD_SIZE] = {0};
-  char orig[HEAD_SIZE] = {0};
+  char type[HEAD_SIZE];
+  char auth[HEAD_SIZE];
+  char orig[HEAD_SIZE];
 };
 
 class uHTTP{
@@ -72,9 +72,9 @@ class uHTTP{
     Header _head;
 
     uint8_t _method;
-    char *_uri = new char[URI_SIZE]();
-    char *_query = new char[QUERY_SIZE]();
-    char *_body = new char[BODY_SIZE]();
+    char *_uri;
+    char *_query;
+    char *_body;
 };
 
 #endif
