@@ -7,7 +7,7 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-// #define uHTTP_uIP
+#define uHTTP_uIP
 
 #include <Arduino.h>
 #ifdef uHTTP_uIP
