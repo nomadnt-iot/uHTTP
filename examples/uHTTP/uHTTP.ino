@@ -9,14 +9,15 @@
  * This example code is in the public domain.
  **/
 
-// #include <SPI.h>
-#include <UIPEthernet.h>
+#include <SPI.h>
+#include <Ethernet.h>
 #include <uHTTP.h>
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
-IPAddress ipaddr(192, 168, 10, 253);
+IPAddress ipaddr(192, 168, 10, 254);
 
 uHTTP *HTTP;
+EthernetClient *response;
 
 void setup(){
 	Ethernet.begin(macaddr, ipaddr);
@@ -30,7 +31,6 @@ void setup(){
 }
 
 void loop(){
-	EthernetClient *response;
 
 	if((response = HTTP->process())){
 		// You can get request method:
@@ -71,5 +71,5 @@ void loop(){
 		response->stop();
 	}
 
-	delete [] response;
+	//delete [] response;
 }
