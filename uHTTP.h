@@ -7,7 +7,7 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-#define uHTTP_uIP
+// #define uHTTP_uIP
 
 #include <Arduino.h>
 #ifdef uHTTP_uIP
@@ -61,6 +61,8 @@ class uHTTP{
     char *query();
     char *query(const char *key);
     char *body();
+    char *data();
+    char *data(const char *key);
 
     Header head();
     char *head(uint8_t key);

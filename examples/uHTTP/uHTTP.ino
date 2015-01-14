@@ -48,9 +48,15 @@ void loop(){
 		// Or you can get query string:
 		Serial.print(F("QUERY: "));
 		Serial.println(HTTP->query());
-		// Or you can get variable from GET/POST/PUT/DELETE data:
+		// Or you can get variable from GET data:
 		Serial.print(F("QUERY[foo]: "));
 		Serial.println(HTTP->query("foo"));
+		// Or you can get post data:
+		Serial.print(F("DATA: "));
+		Serial.println(HTTP->data());
+		// Or you can get variable from POST/PUT/DELETE data:
+		Serial.print(F("DATA[foo]: "));
+		Serial.println(HTTP->data("foo"));
 		// Or you can get the Content-Type:
 		Serial.print(F("Content-Type: "));
 		Serial.println(HTTP->head(HEADER_TYPE));
@@ -70,6 +76,4 @@ void loop(){
 		response->println(F("Hello World!"));
 		response->stop();
 	}
-
-	//delete [] response;
 }

@@ -174,3 +174,19 @@ char *uHTTP::query(const char *key){
 char *uHTTP::body(){
   return _body;
 }
+
+char *uHTTP::data(){
+  return _body;
+}
+
+char *uHTTP::data(const char *key){
+  char *act, *sub, *ptr;
+  static char copy[BODY_SIZE];
+  strcpy(copy, _body);
+  for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
+    sub = strtok_r(act, "&", &ptr);
+    if (sub == NULL) break;
+  }
+  if(sub != NULL) return strchr(sub, '=') + 1;
+  return NULL;
+}
