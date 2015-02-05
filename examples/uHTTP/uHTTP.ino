@@ -33,6 +33,8 @@ void setup(){
 void loop(){
 
 	if((response = HTTP->process())){
+		Header head = HTTP->head();
+
 		// You can get request method:
 		Serial.print(F("METHOD: "));
 		Serial.println(HTTP->method());
@@ -59,13 +61,16 @@ void loop(){
 		Serial.println(HTTP->data("foo"));
 		// Or you can get the Content-Type:
 		Serial.print(F("Content-Type: "));
-		Serial.println(HTTP->head(HEADER_TYPE));
+		Serial.println(head.type);
+		// Or you can get the Content-Type:
+		Serial.print(F("Content-Length: "));
+		Serial.println(head.length);
 		// Or you can get Authorization token:
 		Serial.print(F("Authorization: "));
-		Serial.println(HTTP->head(HEADER_AUTH));
+		Serial.println(head.auth);
 		// Or you can get Origin header:
 		Serial.print(F("Origin: "));
-		Serial.println(HTTP->head(HEADER_ORIG));
+		Serial.println(head.orig);
 		// Or you can get body:
 		Serial.print(F("BODY: "));
 		Serial.println(HTTP->body());

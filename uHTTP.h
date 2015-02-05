@@ -29,12 +29,6 @@
 #define METHOD_TRACE    8
 #define METHOD_CONNECT  9
 
-// Header types
-#define HEADER_TYPE     0
-#define HEADER_AUTH     1
-#define HEADER_ORIG     2
-#define HEADER_LENGTH   3
-
 // Sizes
 #define METHOD_SIZE     8
 #define URI_SIZE        32
@@ -46,7 +40,7 @@ typedef struct Header{
   char type[HEAD_SIZE];
   char auth[HEAD_SIZE];
   char orig[HEAD_SIZE];
-  char length[HEAD_SIZE];
+  int length;
 };
 
 class uHTTP{
@@ -67,7 +61,6 @@ class uHTTP{
     char *data(const char *key);
 
     Header head();
-    char *head(uint8_t key);
 
   private:
     EthernetServer *server;
