@@ -30,17 +30,19 @@ EthernetClient *uHTTP::process(){
   memset(&_head, 0, sizeof _head);
 
   if(client = server->available()){
-    typedef enum {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY, STOP} states;
+    typedef enum {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY} states;
     states state = METHOD;
 
     uint8_t cursor = 0;
     uint8_t cr = 0;
+    uint8_t body_sz = 0;
 
     char method[METHOD_SIZE] = {0};
 
     bool sub = false;
     char key[HEAD_SIZE] = {0};
 
+    while (client.connected()){
     while(client.available() > 0){
       char c = client.read();
 
@@ -76,7 +78,10 @@ EthernetClient *uHTTP::process(){
           if(cr == 2){ state = KEY; cursor = 0; }
           break;
         case KEY:
-          if(cr == 4){ state = BODY; cursor = 0; }
+          if (cr == 4){ 
+            if (_head.length[0] == '\0') goto stop;
+            else state = BODY; cursor = 0; body_sz = atoi(_head.length); 
+          }
           else if(c == ' '){ cursor = 0; state = VALUE; }
           else if(c != '\r' && c != '\n' && c != ':' && cursor < HEAD_SIZE - 1){ key[cursor++] = c; key[cursor] = '\0'; }
           break;
@@ -93,19 +98,22 @@ EthernetClient *uHTTP::process(){
               }else if(strcmp_P(key, PSTR("Origin")) == 0){
                 if(cursor < HEAD_SIZE - 1){ _head.orig[cursor++] = c; _head.orig[cursor] = '\0'; }
               }
+              else if(strcmp_P(key, PSTR("Content-Length")) == 0){
+                if(cursor < HEAD_SIZE - 1){ _head.length[cursor++] = c; _head.length[cursor] = '\0'; }
+              }
             }
           }
           break;
         case BODY:
-          if(cr == 2) state = STOP;
-          else if(cursor < BODY_SIZE){ _body[cursor++] = c; _body[cursor] = '\0'; }
+          if(cursor < BODY_SIZE){ _body[cursor++] = c; _body[cursor] = '\0'; }
+          if(body_sz-- <= 1) { goto stop; }
           break;
-        case STOP:
-          client.flush();
-          break;
+        }
       }
     }
 
+stop:
+    client.flush();
     return &client;
   }
 

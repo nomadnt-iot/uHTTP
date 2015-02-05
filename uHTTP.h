@@ -33,6 +33,7 @@
 #define HEADER_TYPE     0
 #define HEADER_AUTH     1
 #define HEADER_ORIG     2
+#define HEADER_LENGTH   3
 
 // Sizes
 #define METHOD_SIZE     8
@@ -45,6 +46,7 @@ typedef struct Header{
   char type[HEAD_SIZE];
   char auth[HEAD_SIZE];
   char orig[HEAD_SIZE];
+  char length[HEAD_SIZE];
 };
 
 class uHTTP{
