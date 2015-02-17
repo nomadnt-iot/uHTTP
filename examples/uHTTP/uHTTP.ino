@@ -14,7 +14,7 @@
 #include <uHTTP.h>
 
 uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
-IPAddress ipaddr(192, 168, 10, 254);
+IPAddress ipaddr(192, 168, 0, 254);
 
 uHTTP *HTTP;
 EthernetClient *response;
@@ -76,7 +76,7 @@ void loop(){
 		Serial.println(HTTP->body());
 
 		response->println(F("HTTP/1.1 200 OK"));
-		response->println(F("Content-Type"));
+		response->println(F("Content-Type: text/plain"));
 		response->println();
 		response->println(F("Hello World!"));
 		response->stop();
