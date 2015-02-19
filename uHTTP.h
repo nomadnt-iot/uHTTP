@@ -7,6 +7,8 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
+#define uHTTP_CORS
+
 // #define uHTTP_uIP
 
 #include <Arduino.h>
@@ -17,36 +19,33 @@
 #include <Ethernet.h>
 #endif
 
-// Method types
-#define METHOD_UNKNOWN  0
-#define METHOD_OPTIONS  1
-#define METHOD_GET      2
-#define METHOD_HEAD     3
-#define METHOD_POST     4
-#define METHOD_PUT      5
-#define METHOD_PATCH    6
-#define METHOD_DELETE   7
-#define METHOD_TRACE    8
-#define METHOD_CONNECT  9
-
 // Sizes
 #define METHOD_SIZE     8
 #define URI_SIZE        32
 #define QUERY_SIZE      32
 #define HEAD_SIZE       32
+#define AUTH_SIZE       16
+#define ORIG_SIZE       16
 #define BODY_SIZE       64
 
+#define HEAD_KEY_SIZE   16
+#define HEAD_VAL_SIZE   32
+
+typedef enum content_t { TEXT_PLAIN, TEXT_HTML, X_WWW_FORM_URLENCODED, FORM_DATA };
+typedef enum method_t  { OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT };
+
 typedef struct Header{
-  char type[HEAD_SIZE];
-  char auth[HEAD_SIZE];
-  char orig[HEAD_SIZE];
-  int length;
+  content_t type;
+  char auth[AUTH_SIZE];
+  char orig[ORIG_SIZE];
+  unsigned int length;
 };
 
 class uHTTP{
 
   public:
     uHTTP(uint16_t port);
+    uHTTP();
     ~uHTTP();
 
     EthernetClient *process();
@@ -54,13 +53,22 @@ class uHTTP{
     uint8_t method();
     char *uri();
     char *uri(uint8_t segment);
+    
     char *query();
     char *query(const char *key);
+    char *query(const __FlashStringHelper *key);
+
     char *body();
     char *data();
     char *data(const char *key);
+    char *data(const __FlashStringHelper *key);
 
     Header head();
+
+    bool uri_equals(const char *uri);
+    bool uri_equals(const __FlashStringHelper *uri);
+    bool uri_equals(uint8_t index, const char *uri);
+    bool uri_equals(uint8_t index, const __FlashStringHelper *uri);
 
   private:
     EthernetServer *server;
@@ -68,7 +76,8 @@ class uHTTP{
 
     Header _head;
 
-    uint8_t _method;
+    //uint8_t _method;
+    method_t _method;
     char *_uri;
     char *_query;
     char *_body;

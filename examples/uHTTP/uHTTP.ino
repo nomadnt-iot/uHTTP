@@ -13,18 +13,18 @@
 #include <Ethernet.h>
 #include <uHTTP.h>
 
-uint8_t macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
-IPAddress ipaddr(192, 168, 0, 254);
+byte macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
+byte ip4addr[4] = {192, 168, 10, 254};
 
 uHTTP *HTTP;
 EthernetClient *response;
 
 void setup(){
-	Ethernet.begin(macaddr, ipaddr);
+	Ethernet.begin(macaddr, ip4addr);
 	
 	Serial.begin(9600);
 	Serial.print(F("Starting uHTTP at "));
-	Serial.print(ipaddr);
+	Serial.print(Ethernet.localIP());
 	Serial.println(F(":80"));
 
 	HTTP = new uHTTP(80);
@@ -52,12 +52,14 @@ void loop(){
 		Serial.println(HTTP->query());
 		// Or you can get variable from GET data:
 		Serial.print(F("QUERY[foo]: "));
+		//Serial.println(HTTP->query(F("foo")));
 		Serial.println(HTTP->query("foo"));
 		// Or you can get post data:
 		Serial.print(F("DATA: "));
 		Serial.println(HTTP->data());
 		// Or you can get variable from POST/PUT/DELETE data:
 		Serial.print(F("DATA[foo]: "));
+		//Serial.println(HTTP->data(F("foo")));
 		Serial.println(HTTP->data("foo"));
 		// Or you can get the Content-Type:
 		Serial.print(F("Content-Type: "));
