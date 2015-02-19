@@ -27,7 +27,7 @@ void setup(){
 	Serial.print(Ethernet.localIP());
 	Serial.println(F(":80"));
 
-	HTTP = new uHTTP(80);
+	HTTP = new uHTTP();
 }
 
 void loop(){

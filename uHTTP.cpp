@@ -42,7 +42,11 @@ EthernetClient *uHTTP::process(){
     typedef enum {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY, STOP} states;
     states state = METHOD;
     
+    #ifdef uHTTP_CORS
     typedef enum {NONE, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN} headers;
+    #else
+    typedef enum {NONE, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH} headers;
+    #endif
     headers header = NONE;
 
     uint8_t cursor = 0;
@@ -111,9 +115,11 @@ EthernetClient *uHTTP::process(){
                 case CONTENT_LENGTH:
                   _head.length = atoi(buffer);
                   break;
+                #ifdef uHTTP_CORS
                 case ORIGIN:
                   strncpy(_head.orig, buffer, ORIG_SIZE);
                   break;
+                #endif
               }
               state = KEY; header = NONE; cursor = 0; sub = false;
               memset(buffer, 0, HEAD_VAL_SIZE * sizeof(*buffer));
@@ -122,17 +128,23 @@ EthernetClient *uHTTP::process(){
                 if(header != AUTHORIZATION) header = AUTHORIZATION;
                 if(sub && cursor < AUTH_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
                 else if(c == ' ') sub = true;
-              }else if(strcmp_P(key, PSTR("Content-Type")) == 0){
+              }
+              else if(strcmp_P(key, PSTR("Content-Type")) == 0){
                 if(header != CONTENT_TYPE) header = CONTENT_TYPE;
                 if(sub && cursor < HEAD_VAL_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
                 else if(c == '/') sub = true;
-              }else if(strcmp_P(key, PSTR("Content-Length")) == 0){
+              }
+              else if(strcmp_P(key, PSTR("Content-Length")) == 0){
                 if(header != CONTENT_LENGTH) header = CONTENT_LENGTH;
                 if(cursor < HEAD_VAL_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
-              }else if(strcmp_P(key, PSTR("Origin")) == 0){
+              }
+              
+              #ifdef uHTTP_CORS
+              else if(strcmp_P(key, PSTR("Origin")) == 0){
                 if(header != ORIGIN) header = ORIGIN;
                 if(cursor < ORIG_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0';}
               }
+              #endif
             }
             break;
           case BODY:

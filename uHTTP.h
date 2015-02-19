@@ -7,9 +7,8 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-#define uHTTP_CORS
-
 // #define uHTTP_uIP
+// #define uHTTP_CORS
 
 #include <Arduino.h>
 #ifdef uHTTP_uIP
@@ -23,9 +22,12 @@
 #define METHOD_SIZE     8
 #define URI_SIZE        32
 #define QUERY_SIZE      32
-#define HEAD_SIZE       32
 #define AUTH_SIZE       16
+
+#ifdef uHTTP_CORS
 #define ORIG_SIZE       16
+#endif
+
 #define BODY_SIZE       64
 
 #define HEAD_KEY_SIZE   16
@@ -37,7 +39,9 @@ typedef enum method_t  { OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CO
 typedef struct Header{
   content_t type;
   char auth[AUTH_SIZE];
+  #ifdef uHTTP_CORS
   char orig[ORIG_SIZE];
+  #endif
   unsigned int length;
 };
 
@@ -76,7 +80,6 @@ class uHTTP{
 
     Header _head;
 
-    //uint8_t _method;
     method_t _method;
     char *_uri;
     char *_query;
