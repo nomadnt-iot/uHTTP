@@ -14,18 +14,14 @@
 #include <uHTTP.h>
 
 byte macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
-byte ip4addr[4] = {192, 168, 10, 254};
+byte ip4addr[4] = {192, 168, 0, 254};
 
 uHTTP *HTTP;
 EthernetClient *response;
 
 void setup(){
-	Ethernet.begin(macaddr, ip4addr);
-	
 	Serial.begin(9600);
-	Serial.print(F("Starting uHTTP at "));
-	Serial.print(Ethernet.localIP());
-	Serial.println(F(":80"));
+	Ethernet.begin(macaddr, ip4addr);
 
 	HTTP = new uHTTP();
 }
@@ -33,7 +29,7 @@ void setup(){
 void loop(){
 
 	if((response = HTTP->process())){
-		Header head = HTTP->head();
+		header_t head = HTTP->head();
 
 		// You can get request method:
 		Serial.print(F("METHOD: "));
@@ -70,9 +66,6 @@ void loop(){
 		// Or you can get Authorization token:
 		Serial.print(F("Authorization: "));
 		Serial.println(head.auth);
-		// Or you can get Origin header:
-		Serial.print(F("Origin: "));
-		Serial.println(head.orig);
 		// Or you can get body:
 		Serial.print(F("BODY: "));
 		Serial.println(HTTP->body());

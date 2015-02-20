@@ -7,15 +7,17 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
+// #define DEBUG
+
 // #define uHTTP_uIP
 // #define uHTTP_CORS
 
 #include <Arduino.h>
 #ifdef uHTTP_uIP
-#include <UIPEthernet.h>
+  #include <UIPEthernet.h>
 #else
-#include <SPI.h>
-#include <Ethernet.h>
+  #include <SPI.h>
+  #include <Ethernet.h>
 #endif
 
 // Sizes
@@ -23,20 +25,19 @@
 #define URI_SIZE        32
 #define QUERY_SIZE      32
 #define AUTH_SIZE       16
-
 #ifdef uHTTP_CORS
-#define ORIG_SIZE       16
+  #define ORIG_SIZE     16
 #endif
-
 #define BODY_SIZE       64
 
 #define HEAD_KEY_SIZE   16
 #define HEAD_VAL_SIZE   32
 
-typedef enum content_t { TEXT_PLAIN, TEXT_HTML, X_WWW_FORM_URLENCODED, FORM_DATA };
+
+typedef enum content_t { NONE, TEXT_PLAIN, TEXT_HTML, X_WWW_FORM_URLENCODED, FORM_DATA };
 typedef enum method_t  { OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT };
 
-typedef struct Header{
+typedef struct header_t{
   content_t type;
   char auth[AUTH_SIZE];
   #ifdef uHTTP_CORS
@@ -48,9 +49,11 @@ typedef struct Header{
 class uHTTP{
 
   public:
-    uHTTP(uint16_t port);
     uHTTP();
+    uHTTP(uint16_t port);
     ~uHTTP();
+
+    void begin(uint16_t port);
 
     EthernetClient *process();
 
@@ -67,7 +70,7 @@ class uHTTP{
     char *data(const char *key);
     char *data(const __FlashStringHelper *key);
 
-    Header head();
+    header_t head();
 
     bool uri_equals(const char *uri);
     bool uri_equals(const __FlashStringHelper *uri);
@@ -78,12 +81,15 @@ class uHTTP{
     EthernetServer *server;
     EthernetClient client;
 
-    Header _head;
-
+    header_t _head;
     method_t _method;
+    
     char *_uri;
     char *_query;
     char *_body;
+
+    char *_parse(char *buffer, const char *key);
+    char *_parse(char *buffer, const __FlashStringHelper *key);
 };
 
 #endif

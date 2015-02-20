@@ -7,21 +7,11 @@
 #include "uHTTP.h"
 
 uHTTP::uHTTP(){
-  _uri = new char[URI_SIZE];
-  _query = new char[QUERY_SIZE];
-  _body = new char[BODY_SIZE];
-
-  server = new EthernetServer(80);
-  server->begin();
+  begin(80);
 }
 
 uHTTP::uHTTP(uint16_t port){
-  _uri = new char[URI_SIZE];
-  _query = new char[QUERY_SIZE];
-  _body = new char[BODY_SIZE];
-
-  server = new EthernetServer(port);
-  server->begin();
+  begin(port);
 }
 
 uHTTP::~uHTTP(){
@@ -32,28 +22,38 @@ uHTTP::~uHTTP(){
   delete server;
 }
 
-EthernetClient *uHTTP::process(){
-  memset(_uri, 0, sizeof _uri);
-  memset(_query, 0, sizeof _query);
-  memset(_body, 0, sizeof _body);
-  memset(&_head, 0, sizeof _head);
+void uHTTP::begin(uint16_t port){
+  #ifdef DEBUG
+  Serial.print(F("Starting uHTTP at "));
+  Serial.print(Ethernet.localIP());
+  Serial.println(F(":80"));
+  #endif
 
+  _uri = new char[URI_SIZE];
+  _query = new char[QUERY_SIZE];
+  _body = new char[BODY_SIZE];
+
+  server = new EthernetServer(port);
+  server->begin();
+}
+
+EthernetClient *uHTTP::process(){
   if(client = server->available()){
-    typedef enum {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY, STOP} states;
+    memset(_uri, 0, sizeof(_uri));
+    memset(_query, 0, sizeof(_query));
+    memset(_body, 0, sizeof(_body));
+    memset(&_head, 0, sizeof(_head));
+
+    typedef enum {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY} states;
     states state = METHOD;
     
-    #ifdef uHTTP_CORS
-    typedef enum {NONE, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN} headers;
-    #else
-    typedef enum {NONE, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH} headers;
-    #endif
-    headers header = NONE;
+    typedef enum {START, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN} headers;
+    headers header = START;
 
     uint8_t cursor = 0;
     uint8_t cr = 0;
 
     bool sub = false;
-    char key[HEAD_KEY_SIZE] = {0};
     char buffer[HEAD_VAL_SIZE] = {0};
 
     while(client.connected()){
@@ -93,10 +93,10 @@ EthernetClient *uHTTP::process(){
           case KEY:
             if (cr == 4){ state = BODY; cursor = 0; }
             else if(c == ' '){ cursor = 0; state = VALUE; }
-            else if(c != '\r' && c != '\n' && c != ':' && cursor < HEAD_KEY_SIZE - 1){ key[cursor++] = c; key[cursor] = '\0'; }
+            else if(c != '\r' && c != '\n' && c != ':' && cursor < HEAD_KEY_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
             break;
           case VALUE:
-            if(cr == 2){
+            if(cr == 2){            
               switch(header){
                 case AUTHORIZATION:
                   strncpy(_head.auth, buffer, AUTH_SIZE);
@@ -121,38 +121,35 @@ EthernetClient *uHTTP::process(){
                   break;
                 #endif
               }
-              state = KEY; header = NONE; cursor = 0; sub = false;
+              state = KEY; header = START; cursor = 0; sub = false;
               memset(buffer, 0, HEAD_VAL_SIZE * sizeof(*buffer));
             }else if(c != '\r' && c != '\n'){
-              if(strcmp_P(key, PSTR("Authorization")) == 0){
-                if(header != AUTHORIZATION) header = AUTHORIZATION;
-                if(sub && cursor < AUTH_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
-                else if(c == ' ') sub = true;
+              if(header == START){
+                if(strncmp_P(buffer, PSTR("Auth"), 4) == 0) header = AUTHORIZATION;
+                else if(strncmp_P(buffer, PSTR("Content-T"), 9) == 0) header = CONTENT_TYPE;
+                else if(strncmp_P(buffer, PSTR("Content-L"), 9) == 0) header = CONTENT_LENGTH;
               }
-              else if(strcmp_P(key, PSTR("Content-Type")) == 0){
-                if(header != CONTENT_TYPE) header = CONTENT_TYPE;
-                if(sub && cursor < HEAD_VAL_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
-                else if(c == '/') sub = true;
+              // Fill buffer
+              if(cursor < HEAD_VAL_SIZE - 1){
+                switch(header){
+                 case AUTHORIZATION:
+                    if(sub){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+                    else if(c == ' ') sub = true;
+                    break;
+                  case CONTENT_TYPE:
+                    if(sub){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+                    else if(c == '/') sub = true;
+                    break;
+                  case CONTENT_LENGTH:
+                    buffer[cursor++] = c; buffer[cursor] = '\0';
+                    break;
+                }
               }
-              else if(strcmp_P(key, PSTR("Content-Length")) == 0){
-                if(header != CONTENT_LENGTH) header = CONTENT_LENGTH;
-                if(cursor < HEAD_VAL_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
-              }
-              
-              #ifdef uHTTP_CORS
-              else if(strcmp_P(key, PSTR("Origin")) == 0){
-                if(header != ORIGIN) header = ORIGIN;
-                if(cursor < ORIG_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0';}
-              }
-              #endif
             }
             break;
           case BODY:
-            if(cr == 2 || _head.length == 0) state = STOP;
+            if(cr == 2 || _head.length == 0) client.flush();
             else if(cursor < BODY_SIZE - 1){ _body[cursor++] = c; _body[cursor] = '\0'; }
-            break;
-          case STOP:
-            client.flush();
             break;
         }
       }
@@ -172,7 +169,7 @@ char *uHTTP::uri(){
 
 char* uHTTP::uri(uint8_t index){
   char *act, *segment, *ptr;
-  static char copy[URI_SIZE];
+  char copy[URI_SIZE];
   uint8_t i;
   strcpy(copy, _uri);
   for(i = 1, act = copy; i <= index; i++, act = NULL) {
@@ -198,7 +195,7 @@ bool uHTTP::uri_equals(uint8_t index, const __FlashStringHelper *uri){
   return (strcmp_P(this->uri(index), (const PROGMEM char *) uri) == 0) ? true : false;
 }
 
-Header uHTTP::head(){
+header_t uHTTP::head(){
   return _head;
 }
 
@@ -207,28 +204,11 @@ char *uHTTP::query(){
 }
 
 char *uHTTP::query(const char *key){
-  char *act, *sub, *ptr;
-  static char copy[QUERY_SIZE];
-  strcpy(copy, _query);
-  for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
-    sub = strtok_rP(act, PSTR("&"), &ptr);
-    if (sub == NULL) break;
-  }
-  if(sub != NULL) return strchr(sub, '=') + 1;
-  return NULL;
+  return _parse(_query, key);
 }
 
 char *uHTTP::query(const __FlashStringHelper *key){
-  char *act, *sub, *ptr;
-  static char copy[QUERY_SIZE];
-  strcpy(copy, _query);
-
-  for(act = copy; strncmp_P(sub, (const PROGMEM char *) key, strlen_P((const PROGMEM char *) key)); act = NULL) {
-    sub = strtok_rP(act, PSTR("&"), &ptr);
-    if (sub == NULL) break;
-  }
-  if(sub != NULL) return strchr(sub, '=') + 1;
-  return NULL;
+  return _parse(_query, key);
 }
 
 char *uHTTP::body(){
@@ -240,10 +220,18 @@ char *uHTTP::data(){
 }
 
 char *uHTTP::data(const char *key){
+  return _parse(_body, key);
+}
+
+char *uHTTP::data(const __FlashStringHelper *key){
+  return _parse(_body, key);
+}
+
+char *uHTTP::_parse(char *buffer, const char *key){
   char *act, *sub, *ptr;
-  static char copy[BODY_SIZE];
-  strcpy(copy, _body);
-  for (act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
+  char copy[BODY_SIZE];
+  strcpy(copy, buffer);
+  for(act = copy; strncmp(sub, key, strlen(key)); act = NULL) {
     sub = strtok_r(act, "&", &ptr);
     if (sub == NULL) break;
   }
@@ -251,10 +239,10 @@ char *uHTTP::data(const char *key){
   return NULL;
 }
 
-char *uHTTP::data(const __FlashStringHelper *key){
+char *uHTTP::_parse(char *buffer, const __FlashStringHelper *key){
   char *act, *sub, *ptr;
-  static char copy[BODY_SIZE];
-  strcpy(copy, _body);
+  char copy[BODY_SIZE];
+  strcpy(copy, buffer);
   for(act = copy; strncmp_P(sub, (const PROGMEM char *) key, strlen_P((const PROGMEM char *) key)); act = NULL) {
     sub = strtok_rP(act, PSTR("&"), &ptr);
     if (sub == NULL) break;
