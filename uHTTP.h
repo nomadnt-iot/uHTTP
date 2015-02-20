@@ -7,7 +7,7 @@
 #ifndef uHTTP_H
 #define uHTTP_H
 
-// #define DEBUG
+#define DEBUG
 
 // #define uHTTP_uIP
 // #define uHTTP_CORS
@@ -32,7 +32,6 @@
 
 #define HEAD_KEY_SIZE   16
 #define HEAD_VAL_SIZE   32
-
 
 typedef enum content_t { NONE, TEXT_PLAIN, TEXT_HTML, X_WWW_FORM_URLENCODED, FORM_DATA };
 typedef enum method_t  { OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT };
