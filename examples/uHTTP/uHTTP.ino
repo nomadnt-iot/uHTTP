@@ -70,10 +70,10 @@ void loop(){
 		Serial.print(F("BODY: "));
 		Serial.println(HTTP->body());
 
-		response->println(F("HTTP/1.1 200 OK"));
-		response->println(F("Content-Type: text/plain"));
+		response->println("HTTP/1.1 200 OK");
+		response->println("Content-Type: text/plain");
 		response->println();
-		response->println(F("Hello World!"));
+		response->println("Hello World!");
 		response->stop();
 	}
 }
