@@ -87,6 +87,7 @@ EthernetClient *uHTTP::process(){
           case QUERY:
             if(c == ' '){ state = PROTO; cursor = 0; }
             else if(cursor < QUERY_SIZE - 1){ _query[cursor++] = c; _query[cursor] = '\0'; }
+            break;
           case PROTO:
             if(cr == 2){ state = KEY; cursor = 0; }
             break;
@@ -96,7 +97,7 @@ EthernetClient *uHTTP::process(){
             else if(c != '\r' && c != '\n' && c != ':' && cursor < HEAD_KEY_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
             break;
           case VALUE:
-            if(cr == 2){            
+            if(cr == 2){
               switch(header){
                 case AUTHORIZATION:
                   strncpy(_head.auth, buffer, AUTH_SIZE);
@@ -132,7 +133,7 @@ EthernetClient *uHTTP::process(){
               // Fill buffer
               if(cursor < HEAD_VAL_SIZE - 1){
                 switch(header){
-                 case AUTHORIZATION:
+                  case AUTHORIZATION:
                     if(sub){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
                     else if(c == ' ') sub = true;
                     break;
