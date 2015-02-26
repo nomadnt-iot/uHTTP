@@ -36,7 +36,7 @@ typedef struct header_t{
 
 class uHTTP : public EthernetServer {
   private:
-    //const __FlashStringHelper *__name;
+    const __FlashStringHelper *__name;
 
     header_t __head;
 

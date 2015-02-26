@@ -46,6 +46,17 @@ void loop(){
     // Or you can get only second segment from uri:
     Serial.print(F("Segment[2]: "));
     Serial.println(server->uri(2));
+    
+    // Or check if url is equals to the passed value
+    if(server->uri(F("foo/bar"))){
+    	// do something here
+    }
+
+    // Or check if only a segment of url is equals to the passed value
+    if(server->uri(1, F("foo"))){
+    	// do something here
+    }
+
     // Or you can get query string:
     Serial.print(F("QUERY: "));
     Serial.println(server->query());
@@ -61,12 +72,15 @@ void loop(){
     // Or you can get the Content-Type:
     Serial.print(F("Content-Type: "));
     Serial.println(head.type);
-    // Or you can get the Content-Type:
+    // Or you can get the Content-Length:
     Serial.print(F("Content-Length: "));
     Serial.println(head.length);
     // Or you can get Authorization token:
     Serial.print(F("Authorization: "));
     Serial.println(head.auth);
+    // Or you can get Origin for CORS:
+    Serial.print(F("Origin: "));
+    Serial.println(head.orig);
     // Or you can get body:
     Serial.print(F("BODY: "));
     Serial.println(server->body());
