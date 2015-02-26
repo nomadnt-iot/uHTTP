@@ -27,54 +27,58 @@
 #define uHTTP_METHOD_TRACE   7
 #define uHTTP_METHOD_CONNECT 8
 
-typedef struct header_t{
-  char type[uHTTP_TYPE_SIZE];
-  char auth[uHTTP_AUTH_SIZE];
-  char orig[uHTTP_ORIG_SIZE];
-  uint16_t length;
-};
+namespace uhttp{
 
-class uHTTP : public EthernetServer {
-  private:
-    const __FlashStringHelper *__name;
+    typedef struct header_t{
+        char type[uHTTP_TYPE_SIZE];
+        char auth[uHTTP_AUTH_SIZE];
+        char orig[uHTTP_ORIG_SIZE];
+        uint16_t length;
+    };
 
-    header_t __head;
+    class uHTTP : public EthernetServer {
+        private:
+            const __FlashStringHelper *__name;
 
-    uint8_t __method;
+            header_t __head;
 
-    char *__uri;
-    char *__query;
-    char *__body;
+            uint8_t __method;
 
-    char *parse(const char *needle, char *haystack, const __FlashStringHelper *sep);
-    char *parse(const __FlashStringHelper *needle, char *haystack, const __FlashStringHelper *sep);
+            char *__uri;
+            char *__query;
+            char *__body;
 
-  public:
-    uHTTP();
-    uHTTP(uint16_t port);
-    ~uHTTP();
+            char *parse(const char *needle, char *haystack, const __FlashStringHelper *sep);
+            char *parse(const __FlashStringHelper *needle, char *haystack, const __FlashStringHelper *sep);
 
-    EthernetClient available();
+        public:
+            uHTTP();
+            uHTTP(uint16_t port);
+            ~uHTTP();
 
-    header_t head();
+            EthernetClient available();
 
-    uint8_t method();
-    bool method(uint8_t type);
+            header_t head();
 
-    char *uri();
-    char *uri(uint8_t segment);
-    bool uri(const char *uri);
-    bool uri(const __FlashStringHelper *uri);
-    bool uri(uint8_t index, const char *uri);
-    bool uri(uint8_t index, const __FlashStringHelper *uri);
-    
-    char *query();
-    char *query(const char *key);
-    char *query(const __FlashStringHelper *key);
+            uint8_t method();
+            bool method(uint8_t type);
 
-    char *body();
-    char *data(const char *key);
-    char *data(const __FlashStringHelper *key);
-};
+            char *uri();
+            char *uri(uint8_t segment);
+            bool uri(const char *uri);
+            bool uri(const __FlashStringHelper *uri);
+            bool uri(uint8_t index, const char *uri);
+            bool uri(uint8_t index, const __FlashStringHelper *uri);
+            
+            char *query();
+            char *query(const char *key);
+            char *query(const __FlashStringHelper *key);
+
+            char *body();
+            char *data(const char *key);
+            char *data(const __FlashStringHelper *key);
+    };
+
+}
 
 #endif
