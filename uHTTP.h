@@ -1,94 +1,80 @@
-/*
-  uHTTP.h - Library that implement HTTP request interface.
-  Created by Filippo Sallemi, July 23, 2014.
-  Released into the public domain.
-*/
-
 #ifndef uHTTP_H
 #define uHTTP_H
 
-#define DEBUG
+#include "Arduino.h"
+#include "EthernetClient.h"
+#include "EthernetServer.h"
 
-// #define uHTTP_uIP
-// #define uHTTP_CORS
-
-#include <Arduino.h>
-#ifdef uHTTP_uIP
-  #include <UIPEthernet.h>
-#else
-  #include <SPI.h>
-  #include <Ethernet.h>
-#endif
+// #define uHTTP_DEBUG
 
 // Sizes
-#define METHOD_SIZE     8
-#define URI_SIZE        32
-#define QUERY_SIZE      32
-#define AUTH_SIZE       16
-#ifdef uHTTP_CORS
-  #define ORIG_SIZE     16
-#endif
-#define BODY_SIZE       64
+#define uHTTP_BUFFER_SIZE    255
+#define uHTTP_METHOD_SIZE    8
+#define uHTTP_URI_SIZE       32
+#define uHTTP_QUERY_SIZE     32
+#define uHTTP_AUTH_SIZE      32
+#define uHTTP_TYPE_SIZE      34
+#define uHTTP_ORIG_SIZE      16
+#define uHTTP_BODY_SIZE      64
 
-#define HEAD_KEY_SIZE   16
-#define HEAD_VAL_SIZE   32
-
-typedef enum content_t { NONE, TEXT_PLAIN, TEXT_HTML, X_WWW_FORM_URLENCODED, FORM_DATA };
-typedef enum method_t  { OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT };
+#define uHTTP_METHOD_OPTIONS 0
+#define uHTTP_METHOD_GET     1
+#define uHTTP_METHOD_HEAD    2
+#define uHTTP_METHOD_POST    3
+#define uHTTP_METHOD_PUT     4
+#define uHTTP_METHOD_PATCH   5
+#define uHTTP_METHOD_DELETE  6
+#define uHTTP_METHOD_TRACE   7
+#define uHTTP_METHOD_CONNECT 8
 
 typedef struct header_t{
-  content_t type;
-  char auth[AUTH_SIZE];
-  #ifdef uHTTP_CORS
-  char orig[ORIG_SIZE];
-  #endif
-  unsigned int length;
+  char type[uHTTP_TYPE_SIZE];
+  char auth[uHTTP_AUTH_SIZE];
+  char orig[uHTTP_ORIG_SIZE];
+  uint16_t length;
 };
 
-class uHTTP{
+class uHTTP : public EthernetServer {
+  private:
+    //const __FlashStringHelper *__name;
+
+    header_t __head;
+
+    uint8_t __method;
+
+    char *__uri;
+    char *__query;
+    char *__body;
+
+    char *parse(const char *needle, char *haystack, const __FlashStringHelper *sep);
+    char *parse(const __FlashStringHelper *needle, char *haystack, const __FlashStringHelper *sep);
 
   public:
     uHTTP();
     uHTTP(uint16_t port);
     ~uHTTP();
 
-    void begin(uint16_t port);
+    EthernetClient available();
 
-    EthernetClient *process();
+    header_t head();
 
     uint8_t method();
+    bool method(uint8_t type);
+
     char *uri();
     char *uri(uint8_t segment);
+    bool uri(const char *uri);
+    bool uri(const __FlashStringHelper *uri);
+    bool uri(uint8_t index, const char *uri);
+    bool uri(uint8_t index, const __FlashStringHelper *uri);
     
     char *query();
     char *query(const char *key);
     char *query(const __FlashStringHelper *key);
 
     char *body();
-    char *data();
     char *data(const char *key);
     char *data(const __FlashStringHelper *key);
-
-    header_t head();
-
-    bool uri_equals(const char *uri);
-    bool uri_equals(const __FlashStringHelper *uri);
-    bool uri_equals(uint8_t index, const char *uri);
-    bool uri_equals(uint8_t index, const __FlashStringHelper *uri);
-
-  private:
-    EthernetServer *server;
-    EthernetClient client;
-
-    header_t _head;
-    method_t _method;
-    
-    char *_uri;
-    char *_query;
-    char *_body;
-
-    char *_parse(char *buffer, const char *key);
-    char *_parse(char *buffer, const __FlashStringHelper *key);
 };
 
 #endif

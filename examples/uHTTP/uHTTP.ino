@@ -16,64 +16,65 @@
 byte macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 byte ip4addr[4] = {192, 168, 0, 254};
 
-uHTTP *HTTP;
-EthernetClient *response;
+uHTTP *server = new uHTTP(80);
 
 void setup(){
-	Serial.begin(9600);
-	Ethernet.begin(macaddr, ip4addr);
+	Serial.begin(115200);
+  Ethernet.begin(macaddr, ip4addr);
 
-	HTTP = new uHTTP();
+  Serial.print(F("Starting uHTTP at "));
+  Serial.print(Ethernet.localIP());
+  Serial.println(":80");
+
+  server->begin();
 }
 
 void loop(){
+	EthernetClient response = server->available();
+	if(response){
+    header_t head = server->head();
 
-	if((response = HTTP->process())){
-		header_t head = HTTP->head();
+    // You can get request method:
+    Serial.print(F("METHOD: "));
+    Serial.println(server->method());
+    // Or you can get complete uri:
+    Serial.print(F("URI: "));
+    Serial.println(server->uri());
+    // Or you can get only first segment from uri:
+    Serial.print(F("Segment[1]: "));
+    Serial.println(server->uri(1));
+    // Or you can get only second segment from uri:
+    Serial.print(F("Segment[2]: "));
+    Serial.println(server->uri(2));
+    // Or you can get query string:
+    Serial.print(F("QUERY: "));
+    Serial.println(server->query());
+    // Or you can get variable from GET data:
+    Serial.print(F("QUERY[foo]: "));
+    Serial.println(server->query(F("foo")));
+    // Or you can get post data:
+    if(server->method(uHTTP_METHOD_POST)){
+      Serial.print(F("DATA[foo]: "));
+      Serial.println(server->data(F("foo")));
+    }
+    
+    // Or you can get the Content-Type:
+    Serial.print(F("Content-Type: "));
+    Serial.println(head.type);
+    // Or you can get the Content-Type:
+    Serial.print(F("Content-Length: "));
+    Serial.println(head.length);
+    // Or you can get Authorization token:
+    Serial.print(F("Authorization: "));
+    Serial.println(head.auth);
+    // Or you can get body:
+    Serial.print(F("BODY: "));
+    Serial.println(server->body());
 
-		// You can get request method:
-		Serial.print(F("METHOD: "));
-		Serial.println(HTTP->method());
-		// Or you can get complete uri:
-		Serial.print(F("URI: "));
-		Serial.println(HTTP->uri());
-		// Or you can get only first segment from uri:
-		Serial.print(F("Segment[1]: "));
-		Serial.println(HTTP->uri(1));
-		// Or you can get only second segment from uri:
-		Serial.print(F("Segment[2]: "));
-		Serial.println(HTTP->uri(2));
-		// Or you can get query string:
-		Serial.print(F("QUERY: "));
-		Serial.println(HTTP->query());
-		// Or you can get variable from GET data:
-		Serial.print(F("QUERY[foo]: "));
-		//Serial.println(HTTP->query(F("foo")));
-		Serial.println(HTTP->query("foo"));
-		// Or you can get post data:
-		Serial.print(F("DATA: "));
-		Serial.println(HTTP->data());
-		// Or you can get variable from POST/PUT/DELETE data:
-		Serial.print(F("DATA[foo]: "));
-		//Serial.println(HTTP->data(F("foo")));
-		Serial.println(HTTP->data("foo"));
-		// Or you can get the Content-Type:
-		Serial.print(F("Content-Type: "));
-		Serial.println(head.type);
-		// Or you can get the Content-Type:
-		Serial.print(F("Content-Length: "));
-		Serial.println(head.length);
-		// Or you can get Authorization token:
-		Serial.print(F("Authorization: "));
-		Serial.println(head.auth);
-		// Or you can get body:
-		Serial.print(F("BODY: "));
-		Serial.println(HTTP->body());
-
-		response->println("HTTP/1.1 200 OK");
-		response->println("Content-Type: text/plain");
-		response->println();
-		response->println("Hello World!");
-		response->stop();
-	}
+    response.println("HTTP/1.1 200 OK");
+    response.println("Content-Type: text/plain");
+    response.println();
+    response.println("Hello World!");
+    response.stop();
+  }
 }
