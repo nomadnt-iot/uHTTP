@@ -39,8 +39,9 @@ namespace uhttp{
   	EthernetClient client;
 
   	memset(__uri, 0, sizeof(__uri));
-      memset(__query, 0, sizeof(__query));
-      memset(__body, 0, sizeof(__body));
+    memset(__query, 0, sizeof(__query));
+    memset(__body, 0, sizeof(__body));
+    memset(&__head, 0, sizeof(__head));
 
   	if(client = EthernetServer::available()){
   		uint8_t cursor = 0, cr = 0;
