@@ -5,6 +5,10 @@ uHTTP is a tiny library for Arduino that provide a very manner way to access to 
 
 This library is written by Filippo Sallemi <fsallemi@nomadnt.com>
 
+<p align="center"><a href='https://pledgie.com/campaigns/28538'>
+    <img alt='Click here to lend your support to: uHTTP and make a donation!' src='https://pledgie.com/campaigns/28538.png?skin_name=chrome' border='0' >
+</a></p>
+
 Installation
 --
 
