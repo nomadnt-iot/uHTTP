@@ -15,8 +15,8 @@ uHTTP::uHTTP() : EthernetServer(80){
 uHTTP::uHTTP(uint16_t port) : EthernetServer(port){
 	__name = F("uHTTP");
 	__uri = new char[uHTTP_URI_SIZE];
-    __query = new char[uHTTP_QUERY_SIZE];
-    __body = new char[uHTTP_BODY_SIZE];
+  __query = new char[uHTTP_QUERY_SIZE];
+  __body = new char[uHTTP_BODY_SIZE];
 }
 
 /**
@@ -37,9 +37,9 @@ EthernetClient uHTTP::available(){
 	EthernetClient client;
 
 	memset(__uri, 0, sizeof(__uri));
-  memset(__query, 0, sizeof(__query));
-  memset(__body, 0, sizeof(__body));
-  memset(&__head, 0, sizeof(__head));
+    memset(__query, 0, sizeof(__query));
+    memset(__body, 0, sizeof(__body));
+    memset(&__head, 0, sizeof(__head));
 
 	if(client = EthernetServer::available()){
 		uint8_t cursor = 0, cr = 0;
@@ -47,10 +47,10 @@ EthernetClient uHTTP::available(){
 		bool sub = false;
 
 		enum state_t {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY};
-    	state_t state = METHOD;
+    state_t state = METHOD;
 
-    	enum header_t {START, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN};
-    	header_t header = START;
+    enum header_t {START, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN};
+    header_t header = START;
 
 		while(client.connected() && client.available()){
       		char c = client.read();
@@ -123,7 +123,7 @@ EthernetClient uHTTP::available(){
                   			break;
               			}
             			state = KEY; header = START; cursor = 0; sub = false;
-            		}else{
+            		}else if(c != '\r' && c!= '\n'){
             			if(header == START){
                 			if(strncmp_P(buffer, PSTR("Auth"), 4) == 0) header = AUTHORIZATION;
                 			else if(strncmp_P(buffer, PSTR("Content-T"), 9) == 0) header = CONTENT_TYPE;
@@ -131,7 +131,7 @@ EthernetClient uHTTP::available(){
               			}
 
               			// Fill buffer
-              			if(cursor < uHTTP_BUFFER_SIZE - 1 && c != '\r' && c!= '\n'){
+              			if(cursor < uHTTP_BUFFER_SIZE - 1){
                 			switch(header){
                   				case AUTHORIZATION:
                     				if(sub){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
