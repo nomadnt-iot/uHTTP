@@ -13,21 +13,17 @@
 #include <Ethernet.h>
 #include <uHTTP.h>
 
-const PROGMEM char JSON[] = "{\"id\": %u, \"pin\": %u, \"value\": %u, \"pwm\": %u}";
+const PROGMEM char JSON_DIGITAL[] = "{\"id\": %u, \"pin\": %u, \"value\": %u, \"pwm\": %u}";
+const PROGMEM char JSON_ANALOG[] = "{\"id\": %u, \"pin\": %u, \"value\": %u}";
 
 struct output_t{
     uint8_t pin;
     uint8_t value;
     uint8_t pwm;
-};
+} output[8];
 
 byte macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x66};
 byte ip4addr[4] = {192, 168, 0, 254};
-
-uint8_t DIGITAL[8] = {2, 3, 4, 5, 6, 7, 8, 9};               // Allowed digital pins to be used from REST
-uint8_t ANALOG[6]  = {0, 1, 2, 3, 4, 5};                     // Allowed analog pins to be used from REST
-
-output_t output[8];
 
 uHTTP *server = new uHTTP(80);
 EthernetClient response;
@@ -55,8 +51,8 @@ void setup(){
     output[6] = {8, 0, 0};
     output[7] = {9, 0, 1};
 
-    for(uint8_t i = 0; DIGITAL[i]; i++) pinMode(DIGITAL[i], OUTPUT);
-    for(uint8_t i = 0; ANALOG[i]; i++) pinMode(ANALOG[i], INPUT);
+    for(uint8_t i = 0; i < 8; i++) pinMode(output[i].pin, OUTPUT);
+    for(uint8_t i = 0; i < 6; i++) pinMode(i, INPUT);
 
     Serial.println(output[7].pwm);
 
@@ -112,14 +108,14 @@ void digitalProcess(){
             }
         }
 
-        sprintf_P(buffer, JSON, id, output[id - 1].pin, output[id - 1].value, output[id - 1].pwm);
+        sprintf_P(buffer, JSON_DIGITAL, id, output[id - 1].pin, output[id - 1].value, output[id - 1].pwm);
         render(200, buffer);
     }else{
         uint8_t size = sizeof(output) / sizeof(output_t);
         send_headers(200);
         response.print(F("["));
         for(uint8_t i = 0; i < size; i++){
-            sprintf_P(buffer, JSON, i + 1, output[i].pin, output[i].value, output[i].pwm);
+            sprintf_P(buffer, JSON_DIGITAL, i + 1, output[i].pin, output[i].value, output[i].pwm);
             response.print(buffer);
             if(i < size - 1) response.print(F(", "));
         }
@@ -127,59 +123,21 @@ void digitalProcess(){
     }
 }
 
-/*void digitalProcess(){
-    char buffer[32] = {0};
-
-    if(strlen(server->uri(2))){
-        uint8_t pin = atoi(server->uri(2));
-        uint8_t value;
-
-        if(server->method(uHTTP_METHOD_PUT)){
-            if(strcmp_P(server->data(F("value")), PSTR("HIGH") ) == 0){
-                value = HIGH;
-                digitalWrite(pin, value);
-            }else if(strcmp_P(server->data(F("value")), PSTR("LOW") ) == 0){
-                value = LOW;
-                digitalWrite(pin, value);
-            }else{
-                value = atoi(server->data(F("value")));
-                analogWrite(pin, value);
-            }
-        }
-
-        sprintf_P(buffer, JSON, pin, value);
-        render(200, buffer);
-    }else{
-        uint8_t size = sizeof(DIGITAL) / sizeof(uint8_t);
-
-        send_headers(200);
-        response.print(F("["));
-        for(uint8_t i = 0; i < size; i++){
-            sprintf_P(buffer, JSON, i, digitalRead(DIGITAL[i]));
-            response.print(buffer);
-            if(i < size - 1) response.print(F(", "));
-        }
-        response.println(F("]"));
-    }
-}*/
-
 void analogProcess(){
-    char buffer[32] = {0};
-    uint8_t pin = atoi(server->uri(2));
+    char buffer[64] = {0};
+    uint8_t id = atoi(server->uri(2));
 
-    if(strlen(server->uri(2))){
-        sprintf_P(buffer, JSON, pin, analogRead(ANALOG[pin]));
+    if(id){
+        sprintf_P(buffer, JSON_ANALOG, id, id - 1, analogRead(id - 1));
         render(200, buffer);
     }else{
-        uint8_t size = sizeof(ANALOG) / sizeof(uint8_t);
-
         send_headers(200);
         response.print(F("["));        
 
-        for(uint8_t i = 0; i < size; i++){
-            sprintf_P(buffer, JSON, i, analogRead(ANALOG[i]));
+        for(uint8_t i = 0; i < 6; i++){
+            sprintf_P(buffer, JSON_ANALOG, i + 1, i, analogRead(i));
             response.print(buffer);
-            if(i < size - 1) response.print(F(", "));
+            if(i < 5) response.print(F(", "));
         }
         response.println(F("]"));
     }   
