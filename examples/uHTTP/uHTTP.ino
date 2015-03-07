@@ -14,9 +14,10 @@
 #include <uHTTP.h>
 
 byte macaddr[6] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x66};
-byte ip4addr[4] = {192, 168, 10, 254};
+byte ip4addr[4] = {192, 168, 0, 254};
 
 uHTTP *server = new uHTTP(80);
+EthernetClient response;
 
 void setup(){
 	Serial.begin(115200);
@@ -31,9 +32,8 @@ void setup(){
 }
 
 void loop(){
-	EthernetClient response = server->available();
-	if(response){
-        header_t head = server->head();
+	if((response = server->available())){
+        header_t head = server->head();        
 
         // Or check if url is equals to the passed value
         if(server->uri(F("foo/bar"))){
@@ -91,9 +91,34 @@ void loop(){
         Serial.println(server->body());
 
         response.println("HTTP/1.1 200 OK");
-        response.println("Content-Type: text/plain");
+        response.println("Content-Type: text/html");
+        response.println("Connection: close");
         response.println();
-        response.println("Hello World!");
+        response.println(F("<html lang=\"en\">"));
+        response.println(F("<head>"));
+            response.println(F("<link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>"));
+            response.println(F("<style>"));                
+                response.println(F("body{margin: 0; padding: 0; width: 100%; height: 100%; color: #00878F; display: table; font-weight: 100; font-family: 'Lato';}"));
+                response.println(F(".container{text-align: center; display: table-cell; vertical-align: middle;}"));
+                response.println(F(".content {text-align: center; display: inline-block;}"));
+                response.println(F(".title{font-size: 96px; margin-bottom: 40px;}"));
+                response.println(F(".quote{font-size: 24px; font-weight: bold;}"));
+            response.println(F("</style>")) ;
+            response.println(F("<title>uHTTP</title>"));
+        response.println(F("</head>"));
+        response.println(F("<body>"));
+            response.println(F("<div class=\"container\">"));
+                response.println(F("<div class=\"content\">"));
+                    response.println(F("<div class=\"title\">"));
+                        response.println(F("<a href=\"http://nomadnt.github.io/uHTTP\">"));
+                            response.println(F("<img src=\"https://cloud.githubusercontent.com/assets/8282385/6541264/1b556760-c4c7-11e4-87f7-8268cde78c2e.png\">"));
+                        response.println(F("</a>"));
+                    response.println(F("</div>"));
+                    response.println(F("<div class=\"quote\">Simplicity is the ultimate sophistication. - Leonardo da Vinci</div>"));
+                response.println(F("</div>"));
+            response.println(F("</div>"));
+        response.println(F("</body>"));
+        response.println(F("</html>"));
         response.stop();
     }
 }
