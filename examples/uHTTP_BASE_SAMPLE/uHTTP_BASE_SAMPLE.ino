@@ -96,6 +96,7 @@ void loop(){
         response.println();
         response.println(F("<html lang=\"en\">"));
         response.println(F("<head>"));
+            response.println(F("<meta http-equiv=\"Cache-control\" content=\"public\">"));
             response.println(F("<link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>"));
             response.println(F("<style>"));                
                 response.println(F("body{margin: 0; padding: 0; width: 100%; height: 100%; color: #00878F; display: table; font-weight: 100; font-family: 'Lato';}"));
