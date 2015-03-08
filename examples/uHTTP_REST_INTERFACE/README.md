@@ -7,7 +7,7 @@ uHTTP REST Interface
 uHTTP REST Interface is a simple sketch that show the power of uHTTP library. It is very simple to create a REST like interface
 for your arduino project.
 
-This skecth is written by Filippo Sallemi <fsallemi@nomadnt.com>
+This sketch is written by Filippo Sallemi <fsallemi@nomadnt.com>
 
 REST interface
 --
