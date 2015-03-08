@@ -36,8 +36,8 @@ uHTTP::uHTTP() : EthernetServer(80){
 uHTTP::uHTTP(uint16_t port) : EthernetServer(port){
 	__name = F("uHTTP");
 	__uri = new char[uHTTP_URI_SIZE];
-  __query = new char[uHTTP_QUERY_SIZE];
-  __body = new char[uHTTP_BODY_SIZE];
+    __query = new char[uHTTP_QUERY_SIZE];
+    __body = new char[uHTTP_BODY_SIZE];
 }
 
 /**
@@ -55,23 +55,23 @@ uHTTP::~uHTTP(){
  *	@return EthernetClient client
  **/
 EthernetClient uHTTP::available(){
-	EthernetClient client;
+    EthernetClient client;
 
-	memset(__uri, 0, sizeof(__uri));
+    memset(__uri, 0, sizeof(__uri));
     memset(__query, 0, sizeof(__query));
     memset(__body, 0, sizeof(__body));
     memset(&__head, 0, sizeof(__head));
 
-	if(client = EthernetServer::available()){
-		uint8_t cursor = 0, cr = 0;
-		char buffer[uHTTP_BUFFER_SIZE] = {0};
-		bool sub = false;
+    if(client = EthernetServer::available()){
+        uint8_t cursor = 0, cr = 0;
+        char buffer[uHTTP_BUFFER_SIZE] = {0};
+        bool sub = false;
 
-		enum state_t {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY};
-    state_t state = METHOD;
+        enum state_t {METHOD, URI, QUERY, PROTO, KEY, VALUE, BODY};
+        state_t state = METHOD;
 
-    enum header_t {START, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN};
-    header_t header = START;
+        enum header_t {START, AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH, ORIGIN};
+        header_t header = START;
 
 		while(client.connected() && client.available()){
       		char c = client.read();

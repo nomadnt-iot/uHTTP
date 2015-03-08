@@ -35,6 +35,7 @@
 #define uHTTP_AUTH_SIZE      32
 #define uHTTP_TYPE_SIZE      34
 #define uHTTP_ORIG_SIZE      16
+// #define uHTTP_HOST_SIZE      32
 #define uHTTP_BODY_SIZE      255
 
 #define uHTTP_METHOD_OPTIONS 0
@@ -52,6 +53,7 @@ typedef struct header_t{
     char type[uHTTP_TYPE_SIZE];
     char auth[uHTTP_AUTH_SIZE];
     char orig[uHTTP_ORIG_SIZE];
+    //char host[uHTTP_HOST_SIZE];
     uint16_t length;
 };
 
