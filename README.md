@@ -24,7 +24,7 @@ Additional information can be found on the Arduino website: http://www.arduino.c
 
 Be sure to restart the IDE if it was running.
 
-Configuration
+Documentation
 --
 
 For any further information please visit our [wiki](https://github.com/nomadnt/uHTTP/wiki).
