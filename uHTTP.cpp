@@ -63,7 +63,9 @@ EthernetClient uHTTP::available(){
     memset(&__head, 0, sizeof(__head));
 
     if(client = EthernetServer::available()){
-        uint8_t cursor = 0, cr = 0;
+        uint16_t cursor = 0;
+	uint8_t cr = 0;
+
         char buffer[uHTTP_BUFFER_SIZE] = {0};
         bool sub = false;
 
