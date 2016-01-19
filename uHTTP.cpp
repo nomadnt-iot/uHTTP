@@ -36,8 +36,8 @@ uHTTP::uHTTP() : EthernetServer(80){
 uHTTP::uHTTP(uint16_t port) : EthernetServer(port){
 	__name = F("uHTTP");
 	__uri = new char[uHTTP_URI_SIZE];
-    __query = new char[uHTTP_QUERY_SIZE];
-    __body = new char[uHTTP_BODY_SIZE];
+	__query = new char[uHTTP_QUERY_SIZE];
+	__body = new char[uHTTP_BODY_SIZE];
 }
 
 /**
