@@ -1,9 +1,6 @@
 uHTTP
 =====
-
-<p align="right"><a href='https://pledgie.com/campaigns/28538'>
-    <img alt='Click here to lend your support to: uHTTP and make a donation!' src='https://pledgie.com/campaigns/28538.png?skin_name=chrome' border='0' >
-</a></p>
+[![Donate](https://img.shields.io/badge/paypal-donation-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=tonyputi%40gmail%2ecom&lc=IT&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 uHTTP is a tiny library for Arduino that provide a very manner way to access to HTTP request data
 
@@ -28,7 +25,3 @@ Documentation
 --
 
 For any further information please visit our [wiki](https://github.com/nomadnt/uHTTP/wiki).
-
-<p align="right"><a href='https://pledgie.com/campaigns/28538'>
-    <img alt='Click here to lend your support to: uHTTP and make a donation!' src='https://pledgie.com/campaigns/28538.png?skin_name=chrome' border='0' >
-</a></p>
