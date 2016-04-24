@@ -1,0 +1,15 @@
+{
+	"name": "uHTTP",
+	"keywords": "ultrasonic, ping, sonar, distance, SR04, SRF05, SRF06, DYP-ME007, JSN-SR04T, Parallax PING",
+	"description": "Ultrasonic ping sensor library that works with most sensors, can use a single interface wire, doesn't hang, can run in the background, and is smaller and faster that all other ping libraries.",
+	"authors": {
+		"name": "Filippo Sallemi",
+		"email": "fsallemi@nomadnt.com",
+		"url": "https://github.com/nomadnt/uHTTP"
+	},
+	"include": "uHTTP",
+	"version": "1.4",
+	"downloadUrl": "https://github.com/nomadnt/uHTTP/archive/v1.4.zip",
+	"frameworks": "arduino",
+	"platforms": ["atmelavr"]
+}
