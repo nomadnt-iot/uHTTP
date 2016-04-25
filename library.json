@@ -1,7 +1,7 @@
 {
 	"name": "uHTTP",
-	"keywords": "sensor, ultrasonic, ping, sonar, distance, SR04, SRF05, SRF06, DYP-ME007, JSN-SR04T, Parallax PING",
-	"description": "Ultrasonic ping sensor library that works with most sensors, can use a single interface wire, doesn't hang, can run in the background, and is smaller and faster that all other ping libraries.",
+	"keywords": "tcp, web server, http, html, sd, bootstrap, responsive, js, css",
+	"description": "uHTTP is a tiny library for Arduino that provide a very manner way to access to HTTP request data",
 	"authors": {
 		"name": "Filippo Sallemi",
 		"email": "fsallemi@nomadnt.com",
