@@ -1,7 +1,7 @@
 /**
  * HTTP Base example
  * Serve index.html page and provide a single session authentication for /admin/
- * 
+ *
  * / or /index.html will show home page with no authentication required
  * /admin/ will show sample admin area
  * /logout/ will logoff user
@@ -13,7 +13,7 @@
 #include <Ethernet.h>
 #include <uHTTP.h>
 
-#define SESSION_TIMEOUT     3600            // Session timeout in seconds 
+#define SESSION_TIMEOUT     3600            // Session timeout in seconds
 
 // Base64 encoded token. username: admin, password: admin
 const PROGMEM char TOKEN[] = "YWRtaW46YWRtaW4=";
@@ -41,49 +41,49 @@ unsigned long session_time = 0;
 void setup(){
 	Serial.begin(115200);
 
-    Ethernet.begin(macaddr, ip4addr);
+	Ethernet.begin(macaddr, ip4addr);
 
-    Serial.print(F("Starting uHTTP at "));
-    Serial.print(Ethernet.localIP());
-    Serial.println(":80");
+  Serial.print(F("Starting uHTTP at "));
+	Serial.print(Ethernet.localIP());
+	Serial.println(":80");
 
-    server->begin();
+	server->begin();
 }
 
 void loop(){
 	if((response = server->available())){
-        
-        header_t head = server->head();
 
-        if(server->uri(F("/")) || server->uri(F("/index.html"))){
-            response.println((const __FlashStringHelper *)INDEX);
-        }else if(server->uri(1, F("admin"))){
-            if(session_time > 0 && (millis() - session_time) > (SESSION_TIMEOUT * 1000L)){
-                session_time = 0;
-                response.println((const __FlashStringHelper *) LOGOUT);
-            }else{
-                // Check authentication
-                if(strcmp_P(head.auth, TOKEN) == 0){
-                    session_time = millis();
-                }else{
-                    session_time = 0;
-                }
+  	header_t head = server->head();
 
-                // Check session time
-                if(!session_time){
-                    response.println((const __FlashStringHelper *) LOGIN);
-                }else{
-                    response.println((const __FlashStringHelper *) ADMIN);
-                }
-            }
-        }else if(server->uri(1, F("logout"))){
-            response.println((const __FlashStringHelper *) LOGOUT);
+    if(server->uri(F("/")) || server->uri(F("/index.html"))){
+    	response.println((const __FlashStringHelper *)INDEX);
+    }else if(server->uri(1, F("admin"))){
+      if(session_time > 0 && (millis() - session_time) > (SESSION_TIMEOUT * 1000L)){
+        session_time = 0;
+        response.println((const __FlashStringHelper *) LOGOUT);
+      }else{
+        // Check authentication
+        if(strcmp_P(head.auth, TOKEN) == 0){
+        	session_time = millis();
         }else{
-            response.println((const __FlashStringHelper *) ERROR404);
+          session_time = 0;
         }
 
-        response.stop();
+        // Check session time
+        if(!session_time){
+          response.println((const __FlashStringHelper *) LOGIN);
+        }else{
+          response.println((const __FlashStringHelper *) ADMIN);
+        }
+      }
+    }else if(server->uri(1, F("logout"))){
+      response.println((const __FlashStringHelper *) LOGOUT);
+    }else{
+      response.println((const __FlashStringHelper *) ERROR404);
     }
+
+    response.stop();
+  }
 }
 
 /**
@@ -92,34 +92,34 @@ void loop(){
  *  to the number of response.print/ln calls.
  **/
 void actionIndex(){
-    response.println(F("HTTP/1.1 200 OK"));
-    response.println(F("Content-Type: text/html"));
-    response.println(F("Connection: close"));
-    response.println(F(""));
-    response.println(F("<html lang=\"en\">"));
-    response.println(F("<head>"));
-        response.println(F("<meta http-equiv=\"Cache-control\" content=\"public\">"));
-        response.println(F("<link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>"));
-        response.println(F("<style>"));                
-            response.println(F("body{margin: 0; padding: 0; width: 100%; height: 100%; color: #00878F; display: table; font-weight: 100; font-family: 'Lato';}"));
-            response.println(F(".container{text-align: center; display: table-cell; vertical-align: middle;}"));
-            response.println(F(".content {text-align: center; display: inline-block;}"));
-            response.println(F(".title{font-size: 96px; margin-bottom: 40px;}"));
-            response.println(F(".quote{font-size: 24px; font-weight: bold;}"));
-        response.println(F("</style>")) ;
-        response.println(F("<title>uHTTP</title>"));
-    response.println(F("</head>"));
-    response.println(F("<body>"));
-        response.println(F("<div class=\"container\">"));
-            response.println(F("<div class=\"content\">"));
-                response.println(F("<div class=\"title\">"));
-                    response.println(F("<a href=\"http://nomadnt.github.io/uHTTP\">"));
-                        response.println(F("<img src=\"https://cloud.githubusercontent.com/assets/8282385/6541264/1b556760-c4c7-11e4-87f7-8268cde78c2e.png\">"));
-                    response.println(F("</a>"));
-                response.println(F("</div>"));
-                response.println(F("<div class=\"quote\">Simplicity is the ultimate sophistication. - Leonardo da Vinci</div>"));
-            response.println(F("</div>"));
+	response.println(F("HTTP/1.1 200 OK"));
+  response.println(F("Content-Type: text/html"));
+  response.println(F("Connection: close"));
+  response.println(F(""));
+  response.println(F("<html lang=\"en\">"));
+  response.println(F("<head>"));
+  	response.println(F("<meta http-equiv=\"Cache-control\" content=\"public\">"));
+    response.println(F("<link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>"));
+		response.println(F("<style>"));
+    	response.println(F("body{margin: 0; padding: 0; width: 100%; height: 100%; color: #00878F; display: table; font-weight: 100; font-family: 'Lato';}"));
+      response.println(F(".container{text-align: center; display: table-cell; vertical-align: middle;}"));
+      response.println(F(".content {text-align: center; display: inline-block;}"));
+      response.println(F(".title{font-size: 96px; margin-bottom: 40px;}"));
+      response.println(F(".quote{font-size: 24px; font-weight: bold;}"));
+    response.println(F("</style>")) ;
+    response.println(F("<title>uHTTP</title>"));
+  response.println(F("</head>"));
+  response.println(F("<body>"));
+  	response.println(F("<div class=\"container\">"));
+    	response.println(F("<div class=\"content\">"));
+      	response.println(F("<div class=\"title\">"));
+        	response.println(F("<a href=\"http://nomadnt.github.io/uHTTP\">"));
+          	response.println(F("<img src=\"https://cloud.githubusercontent.com/assets/8282385/6541264/1b556760-c4c7-11e4-87f7-8268cde78c2e.png\">"));
+          response.println(F("</a>"));
         response.println(F("</div>"));
-    response.println(F("</body>"));
-    response.println(F("</html>"));
+        response.println(F("<div class=\"quote\">Simplicity is the ultimate sophistication. - Leonardo da Vinci</div>"));
+      response.println(F("</div>"));
+    response.println(F("</div>"));
+  response.println(F("</body>"));
+  response.println(F("</html>"));
 }

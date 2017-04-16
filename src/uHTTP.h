@@ -17,9 +17,9 @@
 #define uHTTP_H
 
 #if (ARDUINO >= 100)
-    #include "Arduino.h"
+  #include "Arduino.h"
 #else
-    #include "WProgram.h"
+  #include "WProgram.h"
 #endif
 
 #include "EthernetClient.h"
@@ -48,56 +48,67 @@
 #define uHTTP_METHOD_TRACE   7
 #define uHTTP_METHOD_CONNECT 8
 
-
-typedef struct header_t{
-    char type[uHTTP_TYPE_SIZE];
-    char auth[uHTTP_AUTH_SIZE];
-    char orig[uHTTP_ORIG_SIZE];
-    //char host[uHTTP_HOST_SIZE];
-    uint16_t length;
+struct header_t{
+  char type[uHTTP_TYPE_SIZE];
+  char auth[uHTTP_AUTH_SIZE];
+  char orig[uHTTP_ORIG_SIZE];
+  //char host[uHTTP_HOST_SIZE];
+  uint16_t length;
 };
 
 class uHTTP : public EthernetServer {
-    private:
-        const __FlashStringHelper *__name;
+  public:
+    uHTTP();
 
-        header_t __head;
+    uHTTP(uint16_t port);
 
-        uint8_t __method;
+    ~uHTTP();
 
-        char *__uri;
-        char *__query;
-        char *__body;
+    EthernetClient available();
 
-        const char *parse(const char *needle, char *haystack, const __FlashStringHelper *sep);
-        const char *parse(const __FlashStringHelper *needle, char *haystack, const __FlashStringHelper *sep);
+    header_t head();
 
-    public:
-        uHTTP();
-        uHTTP(uint16_t port);
-        ~uHTTP();
+    uint8_t method();
 
-        EthernetClient available();
+    bool method(uint8_t type);
 
-        header_t head();
+    const char *uri();
 
-        uint8_t method();
-        bool method(uint8_t type);
+    const char *uri(uint8_t segment);
 
-        const char *uri();
-        const char *uri(uint8_t segment);
-        bool uri(const char *uri);
-        bool uri(const __FlashStringHelper *uri);
-        bool uri(uint8_t index, const char *uri);
-        bool uri(uint8_t index, const __FlashStringHelper *uri);
-        
-        const char *query();
-        const char *query(const char *key);
-        const char *query(const __FlashStringHelper *key);
+    bool uri(const char *uri);
 
-        const char *body();
-        const char *data(const char *key);
-        const char *data(const __FlashStringHelper *key);
+    bool uri(const __FlashStringHelper *uri);
+
+    bool uri(uint8_t index, const char *uri);
+
+    bool uri(uint8_t index, const __FlashStringHelper *uri);
+
+    const char *query();
+
+    const char *query(const char *key);
+
+    const char *query(const __FlashStringHelper *key);
+
+    const char *body();
+
+    const char *data(const char *key);
+
+    const char *data(const __FlashStringHelper *key);
+  private:
+    const __FlashStringHelper *__name;
+
+    header_t __head;
+
+    uint8_t __method;
+
+    char *__uri;
+    char *__query;
+    char *__body;
+
+    const char *parse(const char *needle, char *haystack, const __FlashStringHelper *sep);
+
+    const char *parse(const __FlashStringHelper *needle, char *haystack, const __FlashStringHelper *sep);
 };
 
 #endif
